@@ -26,6 +26,7 @@ import soundfile as sf
 import streamlit as st
 import pydeck as pdk
 import matplotlib.pyplot as plt
+import pathlib
 
 
 # --------- Data structures ----------------------------------------------------
@@ -202,8 +203,8 @@ def build_waterfall_spectrogram(
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
-    min_db = min(-100.0, float(S_dB.min()))
     max_db = 0.0
+    min_db = max(-80.0, float(np.percentile(S_dB, 5)))
 
     fig, ax = plt.subplots(figsize=(10, 5))
     img = ax.imshow(
@@ -241,6 +242,25 @@ def build_waterfall_spectrogram(
     fig.patch.set_facecolor("#0b0f1a")
     fig.tight_layout()
     return fig
+
+
+def load_loudest_sample(samples_dir: pathlib.Path) -> Tuple[np.ndarray, int] | None:
+    """Scan samples directory and return the loudest WAV by RMS."""
+    wavs = sorted(samples_dir.glob("*.wav"))
+    best = None
+    best_rms = -1.0
+    for wav in wavs:
+        try:
+            audio, sr = sf.read(wav)
+            if audio.ndim > 1:
+                audio = np.mean(audio, axis=1)
+            rms = np.sqrt(np.mean(audio**2))
+            if rms > best_rms:
+                best_rms = rms
+                best = (audio.astype(np.float32), sr)
+        except Exception:
+            continue
+    return best
 
 
 def sample_geo_events() -> pd.DataFrame:
@@ -426,21 +446,29 @@ def main() -> None:
         allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
 
     if nav == "Products":
-        st.subheader("1) 載入音訊")
-        st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
-        uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
-        use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-        audio_bytes: bytes | None = None
-        audio_np: np.ndarray | None = None
+    st.subheader("1) 載入音訊")
+    st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
+    uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
+    use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
+    use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
+    audio_bytes: bytes | None = None
+    audio_np: np.ndarray | None = None
 
-        if uploaded is not None:
-            audio_bytes = uploaded.read()
-            audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
-        elif use_demo:
-            audio_np, sr = generate_demo_audio(sample_rate=sr)
+    if uploaded is not None:
+        audio_bytes = uploaded.read()
+        audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
+    elif use_loudest:
+        best = load_loudest_sample(pathlib.Path("samples"))
+        if best is not None:
+            audio_np, sr = best
             buffer = io.BytesIO()
             sf.write(buffer, audio_np, sr, format="WAV")
             audio_bytes = buffer.getvalue()
+    elif use_demo:
+        audio_np, sr = generate_demo_audio(sample_rate=sr)
+        buffer = io.BytesIO()
+        sf.write(buffer, audio_np, sr, format="WAV")
+        audio_bytes = buffer.getvalue()
 
         if audio_bytes:
             st.audio(audio_bytes, format="audio/wav")
@@ -497,9 +525,7 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            overlay_list: List[DetectionEvent] = []
-            overlay_list.extend(stage1_events)
-            overlay_list.extend(refined_events)
+            overlay_list: List[DetectionEvent] = refined_events  # use final stage only
             fig = build_waterfall_spectrogram(
                 audio_np,
                 sr,
