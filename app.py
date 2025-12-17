@@ -387,16 +387,18 @@ def main() -> None:
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
             background:
-              radial-gradient(140% 140% at 15% 25%, rgba(24,24,34,0.96) 0%, rgba(10,10,16,0.97) 45%, #020305 80%),
-              repeating-linear-gradient(110deg, rgba(255,215,150,0.22) 0, rgba(255,215,150,0.22) 2px, transparent 2px, transparent 14px),
-              repeating-linear-gradient(200deg, rgba(255,195,110,0.16) 0, rgba(255,195,110,0.16) 1px, transparent 1px, transparent 20px),
-              radial-gradient(80% 50% at 80% 10%, rgba(255,215,170,0.18), transparent 60%);
+              radial-gradient(140% 140% at 15% 25%, rgba(26,20,12,0.96) 0%, rgba(8,6,4,0.97) 45%, #020305 80%),
+              repeating-linear-gradient(110deg, rgba(255,215,150,0.28) 0, rgba(255,215,150,0.28) 2px, transparent 2px, transparent 12px),
+              repeating-linear-gradient(200deg, rgba(255,195,110,0.22) 0, rgba(255,195,110,0.22) 1px, transparent 1px, transparent 18px),
+              radial-gradient(90% 60% at 78% 12%, rgba(255,215,170,0.26), transparent 60%),
+              radial-gradient(70% 40% at 20% 80%, rgba(255,200,140,0.18), transparent 55%);
             color: #e7ecff;
         }
         .hero {
             background:
-              linear-gradient(140deg, rgba(35,30,20,0.92) 0%, rgba(20,14,8,0.9) 35%, rgba(240,190,110,0.32) 100%),
-              radial-gradient(180% 140% at 80% 0%, rgba(255,215,150,0.18) 0%, transparent 50%);
+              linear-gradient(140deg, rgba(48,36,20,0.94) 0%, rgba(26,18,10,0.92) 35%, rgba(255,210,130,0.42) 100%),
+              radial-gradient(180% 140% at 80% 0%, rgba(255,215,150,0.26) 0%, transparent 55%),
+              repeating-linear-gradient(105deg, rgba(255,225,160,0.18) 0, rgba(255,225,160,0.18) 1px, transparent 1px, transparent 12px);
             padding: 28px 32px;
             border-radius: 18px;
             color: #f6f8ff;
