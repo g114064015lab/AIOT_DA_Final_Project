@@ -5,7 +5,9 @@ soundfile>=0.12
 numpy>=1.26,<2.1
 scipy>=1.11,<1.13
 matplotlib>=3.8,<3.10
-torch>=2.2,<2.4
+
+# NOTE: torch is omitted here to keep Streamlit Cloud / Python 3.13 deployable.
+# If you train locally (Python 3.10–3.12), install requirements-train.txt instead.
 
 # Optional (install if you wire real models / services)
 # redis>=5.0

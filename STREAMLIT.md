@@ -8,7 +8,7 @@
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements.txt   # 不含 torch，適合 Streamlit 部署
 ```
 2) 安裝 ffmpeg（確保 `ffmpeg` 在 PATH）
 3) 執行 Demo
@@ -38,6 +38,10 @@ streamlit run app.py
 - Stage-2：將 `Stage2SequenceRefiner` 替換成 Transformer/CRNN，讀取序列特徵或 Stage-1 logits，做時序平滑與最終分類。
 - Redis：若需模擬實際流水線，將 Stage-1 輸出寫入 Redis，Stage-2 以滑動窗口批次讀取。
 - 告警：在 Stage-2 結果後掛上 Webhook/SMS/Email，加入冷卻時間與去抖動。
+
+## 部署注意
+- Streamlit Cloud 目前採用 Python 3.13，無官方 torch wheel，故 `requirements.txt` 已移除 torch 依賴。
+- 若需 Torch 推論/訓練，請在本地或自行控管的環境（Python 3.10–3.12）安裝 `requirements-train.txt`。
 
 ## 部署建議
 - 開發模式：`streamlit run app.py`，關閉 `--server.runOnSave=false` 以避免自動重啟時中斷推論。

@@ -1,0 +1,7 @@
+# Training-only dependencies (install on Python 3.10–3.12)
+# Use this for Stage-1 CNN training and future Stage-2 models.
+
+-r requirements.txt
+torch==2.3.1     # PyTorch CPU; ensure Python <=3.12
+# For GPU (optional): replace with matching CUDA wheel, e.g.:
+# torch==2.3.1+cu121 --extra-index-url https://download.pytorch.org/whl/cu121

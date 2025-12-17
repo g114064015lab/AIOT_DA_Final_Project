@@ -50,9 +50,11 @@
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirements.txt   # 不含 torch，適合 Streamlit 部署（Python 3.13 亦可）
 ```
 2) 確認 ffmpeg 在 PATH（若使用麥克風/轉檔）。
+
+> 如需訓練或接入 Torch 模型，請使用 Python 3.10–3.12 並安裝：`pip install -r requirements-train.txt`
 
 ## Streamlit 互動 Demo
 - 執行：`streamlit run app.py`
