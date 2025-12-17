@@ -604,6 +604,73 @@ def main() -> None:
             color: #ffdd99;
             letter-spacing: 0.5px;
         }
+        .manual-card {
+            background: linear-gradient(135deg, rgba(20,22,30,0.95), rgba(14,10,6,0.9));
+            border: 1px solid rgba(255,215,170,0.25);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+            margin-bottom: 10px;
+        }
+        .manual-step {
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+        }
+        .manual-step-number {
+            min-width:34px;
+            height:34px;
+            border-radius:10px;
+            background: linear-gradient(135deg, #ffcf8f, #f0a950);
+            color:#0b0f1a;
+            font-weight:800;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow: inset 0 1px 4px rgba(255,255,255,0.4);
+        }
+        .manual-step-text h4 {
+            margin:0 0 4px 0;
+            color:#f6f8ff;
+        }
+        .manual-step-text p {
+            margin:0;
+            color:#cfd5ff;
+            font-size:13px;
+        }
+        .card-3d {
+            background: linear-gradient(145deg, rgba(30,32,45,0.95), rgba(18,18,26,0.9));
+            border: 1px solid rgba(255,215,170,0.2);
+            border-radius: 18px;
+            box-shadow:
+              0 20px 50px rgba(0,0,0,0.35),
+              inset 0 1px 8px rgba(255,255,255,0.1);
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-3d::before {
+            content:"";
+            position:absolute;
+            inset: -30% 40% auto -30%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,215,150,0.16), transparent 55%);
+            opacity: 0.6;
+            pointer-events:none;
+        }
+        .card-3d h4 {
+            margin: 0 0 6px 0;
+            color: #f6f8ff;
+        }
+        .card-3d p {
+            margin: 4px 0;
+            color: #cfd5ff;
+            font-size: 13px;
+        }
+        .card-3d small {
+            color: #ffdd99;
+            letter-spacing: 0.5px;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -912,11 +979,62 @@ def main() -> None:
         st.subheader("支援與部署")
         st.markdown(
             """
-            - 部署：`pip install -r requirements.txt` → `streamlit run app.py`（建議 Python 3.11）。
-            - 模型：使用 `requirements-train.txt` 於本地訓練，導出 TorchScript/ONNX 後替換 app。
-            - 系統需求：ffmpeg、可選 PyAudio/Redis；HTTPS/TLS 建議。
-            - 疑難排除：缺少 torch 請切 3.10–3.12；ffmpeg 不在 PATH 請安裝並重開終端。
-            """
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">1</div>
+                <div class="manual-step-text">
+                  <h4>環境準備</h4>
+                  <p>安裝 Python 3.11，`pip install -r requirements.txt`，確保 ffmpeg 在 PATH。</p>
+                </div>
+              </div>
+            </div>
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">2</div>
+                <div class="manual-step-text">
+                  <h4>啟動服務</h4>
+                  <p>在專案根目錄執行：`streamlit run app.py`。雲端部署請啟用 headless。</p>
+                </div>
+              </div>
+            </div>
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">3</div>
+                <div class="manual-step-text">
+                  <h4>載入與推論</h4>
+                  <p>上傳音訊或選用 samples，調整 frame/hop、閾值，檢視事件與下載 CSV。</p>
+                </div>
+              </div>
+            </div>
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">4</div>
+                <div class="manual-step-text">
+                  <h4>替換模型</h4>
+                  <p>用 `requirements-train.txt` 訓練 Stage-1/2，導出 TorchScript/ONNX，替換 `Stage1CNNEdgeDetector` / `Stage2SequenceRefiner`。</p>
+                </div>
+              </div>
+            </div>
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">5</div>
+                <div class="manual-step-text">
+                  <h4>部署與安全</h4>
+                  <p>反向代理 + TLS；Webhook 權限/簽名；Redis 設存取控制與監控。</p>
+                </div>
+              </div>
+            </div>
+            <div class="manual-card">
+              <div class="manual-step">
+                <div class="manual-step-number">6</div>
+                <div class="manual-step-text">
+                  <h4>疑難排除</h4>
+                  <p>torch 安裝失敗：改用 Python 3.10–3.12。ffmpeg 缺失：安裝後重開終端。</p>
+                </div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
     else:  # Architecture
         st.subheader("Architecture · GUARD 端到端流程")
