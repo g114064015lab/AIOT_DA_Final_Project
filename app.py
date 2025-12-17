@@ -422,10 +422,36 @@ def main() -> None:
             box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
         }
         section[data-testid="stSidebar"] * {
-            color: #3a2432 !important;
+            color: #2f1c1c !important;
         }
-        section[data-testid="stSidebar"] .stSlider > div {
-            background: rgba(255,255,255,0.5);
+        section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
+            color: #2f1c1c !important;
+            font-weight: 700;
+        }
+        section[data-testid="stSidebar"] input,
+        section[data-testid="stSidebar"] textarea {
+            background: #fff4ec !important;
+            color: #2b1a1a !important;
+            border: 1px solid #e7b8a0 !important;
+            border-radius: 10px !important;
+        }
+        section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"],
+        section[data-testid="stSidebar"] .stMultiSelect div[data-baseweb="select"] {
+            background: #fff4ec !important;
+            color: #2b1a1a !important;
+            border: 1px solid #e7b8a0 !important;
+            border-radius: 10px !important;
+        }
+        section[data-testid="stSidebar"] .stSlider [data-baseweb="track"] {
+            background: #f5e2cf !important;
+        }
+        section[data-testid="stSidebar"] .stSlider [data-baseweb="thumb"] {
+            background: #e58c6f !important;
+            border: 1px solid #c56a4d !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
+        section[data-testid="stSidebar"] .stSlider [data-baseweb="tick"] {
+            background: #8a5d4a !important;
         }
         .hero {
             background:
