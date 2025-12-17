@@ -417,7 +417,7 @@ def main() -> None:
         }
         /* Sidebar */
         section[data-testid="stSidebar"] {
-            background: linear-gradient(160deg, rgba(240, 200, 190,0.92));
+            background: linear-gradient(160deg, rgba(247, 200, 55,0.92));
             border-right: 1px solid rgba(255,215,170,0.35);
             box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
         }
