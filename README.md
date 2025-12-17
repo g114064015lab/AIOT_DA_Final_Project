@@ -17,6 +17,7 @@
 - [監控與警報策略](#監控與警報策略)
 - [安全與隱私](#安全與隱私)
 - [後續路線](#後續路線)
+- [Specification-Driven Development](#specification-driven-development)
 
 ## 核心定位
 - **守護與防禦**：強調安全性、可靠性、低誤報，適用政府/公共安全場景。
@@ -103,3 +104,6 @@ python -m src.train.train_cnn --data-dir data_npz --num-classes 2 --epochs 5 --b
 - 事件定位/SELD 與麥克風陣列支援。
 - 量化/剪枝優化邊緣部署；增加自動標註與半監督訓練。
 - 新增自動化測試：延遲、誤報率、穩定性 smoke tests。
+
+## Specification-Driven Development
+- 主要規格、接受準則、NFR、測試策略請參考 `docs/SPECIFICATION.md`（SDD 文檔）。
