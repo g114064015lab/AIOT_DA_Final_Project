@@ -196,37 +196,42 @@ def build_waterfall_spectrogram(
     sr: int,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Waveform view with unified overlays and dB color emphasis (red=high, blue=low)."""
-    rms = librosa.feature.rms(y=y, frame_length=1024, hop_length=512)[0]
-    times = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=512)
-    db = librosa.amplitude_to_db(rms, ref=np.max)
-    min_db = min(-90.0, float(db.min()))
+    """Waterfall-style log-mel spectrogram (red=高能量, 藍=低能量) with optional event overlays."""
+    hop_length = 512
+    n_mels = 64
+    mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
+    S_dB = librosa.power_to_db(mel, ref=np.max)
+    times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
+    min_db = min(-100.0, float(S_dB.min()))
+    max_db = 0.0
 
-    fig, ax = plt.subplots(figsize=(10, 4))
-    norm_db = (db - min_db) / (0 - min_db + 1e-8)  # normalize to [0,1], higher=hotter
-    # Map to red (max) / blue (min)
-    colors = plt.cm.coolwarm(norm_db)
-    ax.plot(times, db, color="#7da6ff", linewidth=0.8, alpha=0.6)
-    # To emphasize peaks, overlay a thicker line using hot colors
-    ax.scatter(times[::3], db[::3], c=colors[::3], s=6, alpha=0.9, linewidths=0)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    img = ax.imshow(
+        S_dB,
+        origin="lower",
+        aspect="auto",
+        extent=[times.min(), times.max(), 0, n_mels],
+        vmin=min_db,
+        vmax=max_db,
+        cmap="jet",  # red hot, blue cold
+    )
     ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Level (dB, rel.)")
-    ax.set_ylim(min_db, 3)
+    ax.set_ylabel("Mel bin")
+    ax.set_title("Waterfall (Log-Mel, dB)", color="#e9edff")
     ax.set_xlim(times.min(), times.max())
-    ax.xaxis.set_major_locator(plt.MaxNLocator(10))
-    ax.yaxis.set_major_locator(plt.MaxNLocator(8))
-    ax.grid(alpha=0.2, color="gray")
+    ax.set_ylim(0, n_mels)
+    ax.grid(alpha=0.15, color="gray")
+    cbar = fig.colorbar(img, ax=ax, label="dB")
 
     if overlay_events:
-        color = "#8fd3ff"
         for idx, ev in enumerate(overlay_events):
-            ax.axvspan(ev.start, ev.end, color=color, alpha=0.2, linewidth=0)
+            ax.axvspan(ev.start, ev.end, color="white", alpha=0.12, linewidth=0)
             ax.text(
                 (ev.start + ev.end) / 2,
-                min_db + 5 + (idx % 3) * 3,
+                n_mels * 0.9 - (idx % 5) * (n_mels * 0.12),
                 f"{ev.label}",
                 ha="center",
-                va="bottom",
+                va="center",
                 fontsize=9,
                 color="#e9edff",
                 bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.35, edgecolor="none"),
@@ -492,14 +497,9 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            overlay_opts = st.multiselect(
-                "覆蓋事件區間", ["Stage1", "Stage2"], default=["Stage2", "Stage1"]
-            )
             overlay_list: List[DetectionEvent] = []
-            if "Stage1" in overlay_opts:
-                overlay_list.extend(stage1_events)
-            if "Stage2" in overlay_opts:
-                overlay_list.extend(refined_events)
+            overlay_list.extend(stage1_events)
+            overlay_list.extend(refined_events)
             fig = build_waterfall_spectrogram(
                 audio_np,
                 sr,
