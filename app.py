@@ -203,9 +203,11 @@ def build_waterfall_spectrogram(
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
-    max_db = 0.0
-    # 拉高對比：以 1% 分位數為下限，但不低於 -70 dB
-    min_db = max(-70.0, float(np.percentile(S_dB, 1)))
+    vmax = float(np.percentile(S_dB, 99))
+    vmin = float(np.percentile(S_dB, 5))
+    # 保持約 60 dB 動態範圍，避免全藍
+    min_db = max(vmin, vmax - 60.0)
+    max_db = vmax
 
     fig, ax = plt.subplots(figsize=(10, 5))
     img = ax.imshow(
@@ -228,6 +230,7 @@ def build_waterfall_spectrogram(
     ax.grid(alpha=0.15, color="gray")
     cbar = fig.colorbar(img, ax=ax, label="dB")
     cbar.ax.tick_params(colors="#cfd5ff")
+    cbar.set_label("dB", color="#cfd5ff")
 
     if overlay_events:
         for idx, ev in enumerate(overlay_events):
@@ -455,7 +458,7 @@ def main() -> None:
         st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
         uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
         use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
+        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=True if uploaded is None else False)
         audio_bytes: bytes | None = None
         audio_np: np.ndarray | None = None
 
