@@ -332,7 +332,7 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    tabs = ["Products", "Applications", "Case Studies", "Support", "Partners"]
+    tabs = ["Products", "Applications", "Case Studies", "Support", "Architecture"]
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
 
     if nav != "Products":
@@ -518,10 +518,19 @@ def main() -> None:
             - 疑難排除：缺少 torch 請切 3.10–3.12；ffmpeg 不在 PATH 請安裝並重開終端。
             """
         )
-    else:  # Partners
-        st.subheader("合作與整合（流程示意）")
-        st.markdown("下圖示意 GUARD 的端到端管線，可在此區換成合作夥伴 Logo 或自訂圖。")
-        st.image("Arch.png", use_column_width=True, caption="GUARD Pipeline / Partner Integration")
+    else:  # Architecture
+        st.subheader("Architecture · GUARD 端到端流程")
+        st.markdown(
+            """
+            - PyAudio/ffmpeg：接收城市音訊。
+            - Librosa：特徵抽取、切片（Log-Mel/PCEN）。
+            - Stage-1 CNN：片段級高召回偵測。
+            - Redis：特徵/logits 緩衝供序列模型取用。
+            - Transformer/序列模型：時序精煉降誤報。
+            - Deployment/Inference Service：輸出事件、警報與 API。
+            """
+        )
+        st.image("Arch.png", use_column_width=True, caption="GUARD Pipeline")
 
 
 if __name__ == "__main__":
