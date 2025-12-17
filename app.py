@@ -395,9 +395,13 @@ def main() -> None:
             color: #e7ecff;
         }
         .hero {
-            background: linear-gradient(130deg, rgba(67,111,255,0.88), rgba(32,209,216,0.75));
-            padding: 20px 22px;
-            border-radius: 16px;
+            background:
+              linear-gradient(135deg, rgba(10,14,24,0.65), rgba(8,12,24,0.55)),
+              url('https://images.unsplash.com/photo-1527443224154-dc2f0b008696?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 26px 30px;
+            border-radius: 18px;
             color: #f6f8ff;
             box-shadow: 0 20px 50px rgba(0,0,0,0.35);
             border: 1px solid rgba(255,255,255,0.12);
@@ -487,17 +491,17 @@ def main() -> None:
         """,
         unsafe_allow_html=True,
     )
-    st.markdown(
-        """
+        st.markdown(
+            """
         <div class="hero">
-          <div class="badge">GUARD · General Urban Audio Recognition & Defense</div>
-          <h2 style="margin:10px 0 6px 0;">城市聲音事件偵測與公共安全警報</h2>
-          <p style="margin:0;font-size:16px;">GUARD: The City Never Sleeps, Neither Do We.</p>
-          <p style="margin:4px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
+          <div class="badge" style="padding:10px 16px;font-size:15px;">GUARD · General Urban Audio Recognition & Defense</div>
+          <h2 style="margin:14px 0 8px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
+          <p style="margin:0;font-size:16px;font-weight:600;">GUARD: The City Never Sleeps, Neither Do We.</p>
+          <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
         </div>
         """,
-        unsafe_allow_html=True,
-    )
+            unsafe_allow_html=True,
+        )
 
     tabs = ["Products", "Applications", "Case Studies", "Support", "Architecture"]
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
