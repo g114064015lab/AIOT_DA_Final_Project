@@ -253,31 +253,42 @@ def build_waterfall_spectrogram(
 
 
 def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
-    """Pie chart showing event count and duration share by label."""
+    """Nightingale / Coxcomb chart showing event duration share by label."""
     if not events:
         fig, ax = plt.subplots()
         ax.text(0.5, 0.5, "No events", ha="center", va="center")
         ax.axis("off")
         return fig
 
-    # aggregate by label
-    agg: dict[str, dict[str, float]] = {}
+    agg: dict[str, float] = {}
     for ev in events:
-        if ev.label not in agg:
-            agg[ev.label] = {"count": 0, "duration": 0.0}
-        agg[ev.label]["count"] += 1
-        agg[ev.label]["duration"] += max(ev.end - ev.start, 0.0)
+        agg[ev.label] = agg.get(ev.label, 0.0) + max(ev.end - ev.start, 0.0)
 
     labels = list(agg.keys())
-    counts = [agg[k]["count"] for k in labels]
-    durations = [agg[k]["duration"] for k in labels]
+    durations = np.array([agg[k] for k in labels], dtype=float)
+    if durations.sum() == 0:
+        durations = np.ones_like(durations)
+    fractions = durations / durations.sum()
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    axes[0].pie(counts, labels=labels, autopct="%1.0f%%", startangle=90)
-    axes[0].set_title("Event Count Share")
-    axes[1].pie(durations, labels=labels, autopct="%1.0f%%", startangle=90)
-    axes[1].set_title("Event Duration Share (s)")
-    fig.suptitle("Event Distribution (Stage-2)")
+    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
+    angles = np.linspace(0, 2 * np.pi, len(labels) + 1)
+    colors = plt.cm.tab20(np.linspace(0, 1, len(labels)))
+    for i, (lab, frac, val, col) in enumerate(zip(labels, fractions, durations, colors)):
+        ax.bar(
+            x=angles[i],
+            height=frac * 10,  # scale for visual spread
+            width=2 * np.pi / len(labels),
+            color=col,
+            edgecolor="white",
+            linewidth=1.2,
+            alpha=0.9,
+            label=f"{lab}: {val:.2f}s ({frac*100:.1f}%)",
+        )
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(labels)
+    ax.set_yticklabels([])
+    ax.set_title("Event Duration Share (Coxcomb)", va="bottom")
+    ax.legend(loc="center left", bbox_to_anchor=(1.05, 0.5), frameon=False)
     fig.tight_layout()
     return fig
 
