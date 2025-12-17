@@ -25,6 +25,7 @@ import pandas as pd
 import soundfile as sf
 import streamlit as st
 import pydeck as pdk
+import plotly.graph_objects as go
 
 
 # --------- Data structures ----------------------------------------------------
@@ -188,6 +189,54 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
             for ev in events
         ]
     )
+
+
+def build_interactive_spectrogram(
+    y: np.ndarray,
+    sr: int,
+    hop_length: int,
+    n_mels: int,
+    palette: str,
+    overlay_events: List[DetectionEvent] | None = None,
+) -> go.Figure:
+    """Create an interactive log-mel spectrogram with hover and optional event overlays."""
+    mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
+    S_dB = librosa.power_to_db(mel, ref=np.max)
+    times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=S_dB,
+            x=times,
+            y=np.arange(S_dB.shape[0]),
+            colorscale=palette,
+            colorbar=dict(title="dB"),
+            zmin=np.percentile(S_dB, 5),
+            zmax=np.percentile(S_dB, 99),
+        )
+    )
+    fig.update_yaxes(title_text="Mel bin", autorange="reversed")
+    fig.update_xaxes(title_text="Time (s)")
+    if overlay_events:
+        for ev in overlay_events:
+            fig.add_vrect(
+                x0=ev.start,
+                x1=ev.end,
+                fillcolor="rgba(255,255,255,0.15)" if ev.stage == "stage1" else "rgba(255,180,120,0.18)",
+                line_width=0,
+                layer="above",
+                annotation_text=f"{ev.label} ({ev.stage})",
+                annotation_position="top left",
+                annotation_font_size=10,
+                annotation_font_color="#e9edff",
+            )
+    fig.update_layout(
+        height=420,
+        margin=dict(l=40, r=40, t=40, b=40),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(10,12,20,0.9)",
+        font=dict(color="#e9edff"),
+    )
+    return fig
 
 
 def sample_geo_events() -> pd.DataFrame:
@@ -444,8 +493,34 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            fig = plot_spectrogram(audio_np, sr)
-            st.pyplot(fig, clear_figure=True, use_container_width=True)
+            col_cfg1, col_cfg2 = st.columns([2, 1])
+            with col_cfg1:
+                n_mels_opt = st.slider("Mel bins (n_mels)", 32, 128, 64, 8)
+                palette = st.selectbox(
+                    "色階",
+                    ["Turbo", "Inferno", "Magma", "Viridis", "Cividis"],
+                    index=0,
+                )
+            with col_cfg2:
+                overlay_opts = st.multiselect(
+                    "覆蓋事件區間",
+                    ["Stage1", "Stage2"],
+                    default=["Stage2"],
+                )
+            overlay_list: List[DetectionEvent] = []
+            if "Stage1" in overlay_opts:
+                overlay_list.extend(stage1_events)
+            if "Stage2" in overlay_opts:
+                overlay_list.extend(refined_events)
+            fig = build_interactive_spectrogram(
+                audio_np,
+                sr,
+                hop_length=hop_length,
+                n_mels=n_mels_opt,
+                palette=palette.lower(),
+                overlay_events=overlay_list,
+            )
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
         st.markdown("**事件時間軸 (Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
