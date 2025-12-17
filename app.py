@@ -25,7 +25,6 @@ import pandas as pd
 import soundfile as sf
 import streamlit as st
 import pydeck as pdk
-import plotly.graph_objects as go
 
 
 # --------- Data structures ----------------------------------------------------
@@ -191,52 +190,82 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
     )
 
 
-def build_interactive_spectrogram(
+def build_altair_spectrogram(
     y: np.ndarray,
     sr: int,
     hop_length: int,
     n_mels: int,
     palette: str,
+    dyn_range: float,
     overlay_events: List[DetectionEvent] | None = None,
-) -> go.Figure:
-    """Create an interactive log-mel spectrogram with hover and optional event overlays."""
+) -> alt.Chart:
+    """Altair-based log-mel spectrogram with hover, dynamic range, and event overlays."""
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
-    fig = go.Figure(
-        data=go.Heatmap(
-            z=S_dB,
-            x=times,
-            y=np.arange(S_dB.shape[0]),
-            colorscale=palette,
-            colorbar=dict(title="dB"),
-            zmin=np.percentile(S_dB, 5),
-            zmax=np.percentile(S_dB, 99),
+    max_db = float(np.max(S_dB))
+    min_db = max_db - dyn_range
+
+    df = pd.DataFrame(S_dB)
+    df["mel_bin"] = np.arange(S_dB.shape[0])
+    df_long = df.melt(id_vars="mel_bin", var_name="frame", value_name="dB")
+    df_long["time"] = df_long["frame"].map(lambda i: float(times[int(i)]))
+
+    heat = (
+        alt.Chart(df_long)
+        .mark_rect()
+        .encode(
+            x=alt.X("time:Q", title="Time (s)"),
+            y=alt.Y("mel_bin:O", title="Mel bin"),
+            color=alt.Color("dB:Q", scale=alt.Scale(scheme=palette, domain=[min_db, max_db]), title="dB"),
+            tooltip=[
+                alt.Tooltip("time:Q", title="Time (s)", format=".2f"),
+                alt.Tooltip("mel_bin:O", title="Mel bin"),
+                alt.Tooltip("dB:Q", title="dB", format=".1f"),
+            ],
         )
+        .properties(height=420)
     )
-    fig.update_yaxes(title_text="Mel bin", autorange="reversed")
-    fig.update_xaxes(title_text="Time (s)")
+
+    layers = [heat]
     if overlay_events:
+        overlay_df = []
         for ev in overlay_events:
-            fig.add_vrect(
-                x0=ev.start,
-                x1=ev.end,
-                fillcolor="rgba(255,255,255,0.15)" if ev.stage == "stage1" else "rgba(255,180,120,0.18)",
-                line_width=0,
-                layer="above",
-                annotation_text=f"{ev.label} ({ev.stage})",
-                annotation_position="top left",
-                annotation_font_size=10,
-                annotation_font_color="#e9edff",
+            overlay_df.append(
+                {
+                    "start": ev.start,
+                    "end": ev.end,
+                    "label": ev.label,
+                    "stage": ev.stage,
+                    "color": "rgba(255,255,255,0.18)" if ev.stage == "stage1" else "rgba(255,180,120,0.22)",
+                }
             )
-    fig.update_layout(
-        height=420,
-        margin=dict(l=40, r=40, t=40, b=40),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(10,12,20,0.9)",
-        font=dict(color="#e9edff"),
-    )
-    return fig
+        overlay = (
+            alt.Chart(pd.DataFrame(overlay_df))
+            .mark_rect()
+            .encode(
+                x="start:Q",
+                x2="end:Q",
+                y=alt.value(0),
+                y2=alt.value(n_mels * 1.0),
+                color=alt.Color("color:N", legend=None),
+                tooltip=[
+                    alt.Tooltip("label:N", title="Label"),
+                    alt.Tooltip("stage:N", title="Stage"),
+                    alt.Tooltip("start:Q", title="Start (s)", format=".2f"),
+                    alt.Tooltip("end:Q", title="End (s)", format=".2f"),
+                ],
+            )
+        )
+        labels = (
+            alt.Chart(pd.DataFrame(overlay_df))
+            .mark_text(baseline="top", dy=2, color="#e9edff", fontSize=10)
+            .encode(x="start:Q", text="label:N")
+        )
+        layers.extend([overlay, labels])
+
+    chart = alt.layer(*layers).configure_view(stroke=None)
+    return chart
 
 
 def sample_geo_events() -> pd.DataFrame:
@@ -493,13 +522,13 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            col_cfg1, col_cfg2 = st.columns([2, 1])
+            col_cfg1, col_cfg2, col_cfg3 = st.columns([2, 1, 1])
             with col_cfg1:
                 n_mels_opt = st.slider("Mel bins (n_mels)", 32, 128, 64, 8)
                 palette = st.selectbox(
                     "色階",
-                    ["Turbo", "Inferno", "Magma", "Viridis", "Cividis"],
-                    index=0,
+                    ["inferno", "magma", "viridis", "plasma", "turbo", "cividis"],
+                    index=4,
                 )
             with col_cfg2:
                 overlay_opts = st.multiselect(
@@ -507,20 +536,24 @@ def main() -> None:
                     ["Stage1", "Stage2"],
                     default=["Stage2"],
                 )
+            with col_cfg3:
+                dyn_range = st.slider("動態範圍 (dB)", 30, 90, 60, 5)
+
             overlay_list: List[DetectionEvent] = []
             if "Stage1" in overlay_opts:
                 overlay_list.extend(stage1_events)
             if "Stage2" in overlay_opts:
                 overlay_list.extend(refined_events)
-            fig = build_interactive_spectrogram(
+            chart = build_altair_spectrogram(
                 audio_np,
                 sr,
                 hop_length=hop_length,
                 n_mels=n_mels_opt,
-                palette=palette.lower(),
+                palette=palette,
+                dyn_range=dyn_range,
                 overlay_events=overlay_list,
             )
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.altair_chart(chart, use_container_width=True)
 
         st.markdown("**事件時間軸 (Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
