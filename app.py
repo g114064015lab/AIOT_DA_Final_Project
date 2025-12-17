@@ -605,8 +605,8 @@ def main() -> None:
     <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="rgba(0,0,0,0.35)"/>
     </filter>
-    <marker id="arrowHead" markerWidth="14" markerHeight="10" refX="7" refY="5" orient="auto">
-      <polygon points="0 0, 14 5, 0 10" fill="rgba(255,255,255,0.85)" />
+    <marker id="arrowHead" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="rgba(255,255,255,0.85)" />
     </marker>
   </defs>
   <style>
@@ -615,7 +615,7 @@ def main() -> None:
     .desc { fill: #cdd5ff; font-size: 14px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
     .badgeBlue { fill: url(#blueGrad); }
     .badgeOrange { fill: url(#orangeGrad); }
-    .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2.6; marker-end: url(#arrowHead); }
+    .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2; marker-end: url(#arrowHead); }
   </style>
 
   <!-- Source -->
@@ -625,7 +625,7 @@ def main() -> None:
   <text x="60" y="230" class="desc">ffmpeg capture</text>
 
   <!-- Librosa -->
-  <rect x="260" y="70" width="200" height="100" class="card"/>
+  <rect x="260" y="60" width="200" height="100" class="card"/>
   <rect x="280" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
   <text x="280" y="125" class="title">🎵 Librosa</text>
   <text x="280" y="150" class="desc">Feature extract / slice</text>
@@ -637,13 +637,13 @@ def main() -> None:
   <text x="280" y="300" class="desc">Segment edge detect</text>
 
   <!-- Redis -->
-  <rect x="520" y="145" width="200" height="120" class="card"/>
+  <rect x="520" y="135" width="200" height="120" class="card"/>
   <rect x="540" y="160" width="46" height="20" rx="10" class="badgeOrange"/>
   <text x="540" y="200" class="title">🧠 Redis Buffer</text>
   <text x="540" y="225" class="desc">Feature/logits cache</text>
 
   <!-- Transformer -->
-  <rect x="780" y="70" width="200" height="100" class="card"/>
+  <rect x="780" y="60" width="200" height="100" class="card"/>
   <rect x="800" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
   <text x="800" y="125" class="title">🌀 Transformer</text>
   <text x="800" y="150" class="desc">Sequence refine</text>
@@ -655,12 +655,12 @@ def main() -> None:
   <text x="800" y="300" class="desc">Alerts / API</text>
 
   <!-- Arrows -->
-  <line x1="210" y1="210" x2="260" y2="135" class="arrow"/>
-  <line x1="210" y1="210" x2="260" y2="270" class="arrow"/>
-  <line x1="460" y1="135" x2="520" y2="205" class="arrow"/>
-  <line x1="460" y1="270" x2="520" y2="205" class="arrow"/>
-  <line x1="720" y1="205" x2="780" y2="135" class="arrow"/>
-  <line x1="720" y1="205" x2="780" y2="270" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="125" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="280" class="arrow"/>
+  <line x1="460" y1="125" x2="520" y2="205" class="arrow"/>
+  <line x1="460" y1="280" x2="520" y2="205" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="125" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="280" class="arrow"/>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
