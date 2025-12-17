@@ -473,7 +473,7 @@ def main() -> None:
         .logo-bars span {
             display:block;
             width:4px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,200,120,0.6));
+            background: linear-gradient(180deg, rgba(216,171,184,0.9), rgba(255,200,120,0.6));
             border-radius:2px;
             box-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
