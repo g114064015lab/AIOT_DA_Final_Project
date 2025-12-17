@@ -252,6 +252,36 @@ def build_waterfall_spectrogram(
     return fig
 
 
+def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
+    """Pie chart showing event count and duration share by label."""
+    if not events:
+        fig, ax = plt.subplots()
+        ax.text(0.5, 0.5, "No events", ha="center", va="center")
+        ax.axis("off")
+        return fig
+
+    # aggregate by label
+    agg: dict[str, dict[str, float]] = {}
+    for ev in events:
+        if ev.label not in agg:
+            agg[ev.label] = {"count": 0, "duration": 0.0}
+        agg[ev.label]["count"] += 1
+        agg[ev.label]["duration"] += max(ev.end - ev.start, 0.0)
+
+    labels = list(agg.keys())
+    counts = [agg[k]["count"] for k in labels]
+    durations = [agg[k]["duration"] for k in labels]
+
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+    axes[0].pie(counts, labels=labels, autopct="%1.0f%%", startangle=90)
+    axes[0].set_title("Event Count Share")
+    axes[1].pie(durations, labels=labels, autopct="%1.0f%%", startangle=90)
+    axes[1].set_title("Event Duration Share (s)")
+    fig.suptitle("Event Distribution (Stage-2)")
+    fig.tight_layout()
+    return fig
+
+
 def load_loudest_sample(samples_dir: pathlib.Path) -> Tuple[np.ndarray, int] | None:
     """Scan samples directory and return the loudest WAV by RMS."""
     wavs = sorted(samples_dir.glob("*.wav"))
@@ -551,13 +581,8 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            overlay_list: List[DetectionEvent] = refined_events  # use final stage only
-            fig = build_waterfall_spectrogram(
-                audio_np,
-                sr,
-                overlay_events=overlay_list,
-            )
-            st.pyplot(fig, clear_figure=True, use_container_width=True)
+            pie_fig = build_event_pie(refined_events)
+            st.pyplot(pie_fig, clear_figure=True, use_container_width=True)
 
         st.markdown("**事件時間軸 (Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
