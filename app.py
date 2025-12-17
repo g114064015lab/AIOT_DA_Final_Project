@@ -415,6 +415,18 @@ def main() -> None:
               radial-gradient(70% 40% at 20% 80%, rgba(255,200,140,0.18), transparent 55%);
             color: #e7ecff;
         }
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(160deg, rgba(255,210,230,0.9), rgba(255,190,210,0.92));
+            border-right: 1px solid rgba(255,215,170,0.35);
+            box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
+        }
+        section[data-testid="stSidebar"] * {
+            color: #3a2432 !important;
+        }
+        section[data-testid="stSidebar"] .stSlider > div {
+            background: rgba(255,255,255,0.5);
+        }
         .hero {
             background:
               linear-gradient(140deg, rgba(48,36,20,0.94) 0%, rgba(26,18,10,0.92) 35%, rgba(255,210,130,0.42) 100%),
