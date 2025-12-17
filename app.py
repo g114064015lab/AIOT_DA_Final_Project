@@ -918,7 +918,19 @@ def main() -> None:
             bearing=15,
         )
         tooltip = {"text": "Class: {class}\nScore: {score}\nLat: {lat}\nLon: {lon}"}
-        st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state, tooltip=tooltip, map_style="mapbox://styles/mapbox/dark-v11"))
+        map_col, legend_col = st.columns([4, 1])
+        with map_col:
+            st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state, tooltip=tooltip, map_style="mapbox://styles/mapbox/dark-v11"))
+        with legend_col:
+            st.markdown("**圖例**")
+            for lbl, col in color_map.items():
+                st.markdown(
+                    f"<div style='display:flex;align-items:center;gap:8px;margin-bottom:4px;'>"
+                    f"<span style='display:inline-block;width:14px;height:14px;border-radius:4px;background:rgb({col[0]},{col[1]},{col[2]});'></span>"
+                    f"<span style='color:#e9edff;font-size:12px;'>{lbl}</span>"
+                    f"</div>",
+                    unsafe_allow_html=True,
+                )
 
         st.divider()
         c1, c2 = st.columns(2)
