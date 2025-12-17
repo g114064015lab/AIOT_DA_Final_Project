@@ -460,7 +460,7 @@ def main() -> None:
             font-size:22px;
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
-            font-family: 'Halo Handletter', cursive;
+            font-family: 'Monsieur La Doulaise', cursive;
             z-index:2;
         }
         .logo-bars {
