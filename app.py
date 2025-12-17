@@ -436,6 +436,32 @@ def main() -> None:
             opacity:0.35;
             pointer-events:none;
         }
+        .logo-wrap {
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:10px;
+        }
+        .logo-icon {
+            width:48px;
+            height:48px;
+            border-radius:14px;
+            background: radial-gradient(circle at 30% 30%, rgba(255,215,150,0.9), rgba(255,180,90,0.65) 45%, rgba(40,20,10,0.9));
+            box-shadow: 0 10px 25px rgba(0,0,0,0.45), inset 0 1px 6px rgba(255,255,255,0.35);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#0b0f1a;
+            font-weight:800;
+            font-size:20px;
+            letter-spacing:-0.5px;
+        }
+        .logo-text {
+            font-size:22px;
+            font-weight:800;
+            color:#f6f8ff;
+            letter-spacing:0.3px;
+        }
         .badge {
             display:inline-block;
             padding:6px 12px;
@@ -524,8 +550,11 @@ def main() -> None:
     st.markdown(
         """
     <div class="hero">
-      <div class="badge" style="padding:10px 16px;font-size:15px;">GUARD · General Urban Audio Recognition & Defense</div>
-      <h2 style="margin:14px 0 8px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
+      <div class="logo-wrap">
+        <div class="logo-icon">G</div>
+        <div class="logo-text">GUARD · General Urban Audio Recognition & Defense</div>
+      </div>
+      <h2 style="margin:12px 0 6px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
       <p style="margin:0;font-size:16px;font-weight:600;">GUARD: The City Never Sleeps, Neither Do We.</p>
       <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
     </div>
