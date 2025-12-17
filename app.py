@@ -386,10 +386,12 @@ def main() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            background:
-              radial-gradient(140% 140% at 15% 20%, rgba(15,22,40,0.9) 0%, rgba(8,12,24,0.95) 45%, #050915 80%),
-              repeating-linear-gradient(115deg, rgba(255,215,130,0.08) 0, rgba(255,215,130,0.08) 2px, transparent 2px, transparent 14px),
-              repeating-linear-gradient(205deg, rgba(255,235,170,0.05) 0, rgba(255,235,170,0.05) 1px, transparent 1px, transparent 18px);
+            background: #050915;
+            background-image: linear-gradient(rgba(8,12,24,0.72), rgba(8,12,24,0.72)),
+              url('https://images.unsplash.com/photo-1527443224154-dc2f0b008696?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: #e7ecff;
         }
         .hero {
