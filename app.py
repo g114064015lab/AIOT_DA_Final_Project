@@ -592,7 +592,7 @@ def main() -> None:
             """
         )
         svg_arch = """
-<svg width="120%" height="720" viewBox="0 0 1180 520" xmlns="http://www.w3.org/2000/svg">
+<svg width="120%" height="520" viewBox="0 0 1180 520" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4ea1ff"/>
@@ -635,13 +635,13 @@ def main() -> None:
   <text x="60" y="230" class="desc">ffmpeg capture</text>
 
   <!-- Librosa -->
-  <rect x="260" y="60" width="200" height="100" class="card"/>
+  <rect x="260" y="60" width="180" height="100" class="card"/>
   <rect x="280" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
   <text x="280" y="125" class="title">🎵 Librosa</text>
   <text x="280" y="150" class="desc">Feature extract / slice</text>
 
   <!-- Stage1 CNN -->
-  <rect x="260" y="220" width="200" height="100" class="card"/>
+  <rect x="260" y="220" width="180" height="100" class="card"/>
   <rect x="280" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
   <text x="280" y="275" class="title">🔥 Stage-1 CNN</text>
   <text x="280" y="300" class="desc">Segment edge detect</text>
