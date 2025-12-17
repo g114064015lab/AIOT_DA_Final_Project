@@ -340,15 +340,15 @@ def main() -> None:
         """
         <div class="hero">
           <div class="badge">GUARD · General Urban Audio Recognition & Defense</div>
-          <h2 style="margin:10px 0 6px 0;">城市聲音事件偵測與公共安全警報 — 互動 Demo</h2>
-          <p style="margin:0;font-size:16px;">Slogan：GUARD: The City Never Sleeps, Neither Do We.</p>
+          <h2 style="margin:10px 0 6px 0;">城市聲音事件偵測與公共安全警報</h2>
+          <p style="margin:0;font-size:16px;">GUARD: The City Never Sleeps, Neither Do We.</p>
           <p style="margin:4px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    tabs = ["Products", "Applications", "Case Studies", "Support", "Partners"]
+    tabs = ["Products", "Applications", "Case Studies", "Support", "Architecture"]
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
 
     if nav != "Products":
@@ -592,7 +592,7 @@ def main() -> None:
             """
         )
         svg_arch = """
-<svg width="100%" height="520" viewBox="0 0 1180 520" xmlns="http://www.w3.org/2000/svg">
+<svg width="120%" height="720" viewBox="0 0 1180 520" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4ea1ff"/>
