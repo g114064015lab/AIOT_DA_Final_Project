@@ -25,6 +25,7 @@ import pandas as pd
 import soundfile as sf
 import streamlit as st
 import pydeck as pdk
+import matplotlib.pyplot as plt
 
 
 # --------- Data structures ----------------------------------------------------
@@ -199,15 +200,25 @@ def build_waterfall_spectrogram(
     dyn_range: float,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Matplotlib-based waterfall spectrogram with event labels."""
+    """Waveform + waterfall spectrogram with clear Stage1/Stage2 overlays and legend."""
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
     max_db = float(np.max(S_dB))
     min_db = max_db - dyn_range
+    t_wav = np.arange(len(y)) / sr
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    img = ax.imshow(
+    fig, (ax_wav, ax_spec) = plt.subplots(
+        2, 1, figsize=(10, 6), sharex=True, gridspec_kw={"height_ratios": [1, 4]}
+    )
+
+    # Waveform overview
+    ax_wav.plot(t_wav, y, color="#7dd8ff", linewidth=0.8)
+    ax_wav.set_ylabel("Amp")
+    ax_wav.set_yticks([])
+    ax_wav.grid(alpha=0.2)
+
+    img = ax_spec.imshow(
         S_dB,
         origin="lower",
         aspect="auto",
@@ -216,27 +227,36 @@ def build_waterfall_spectrogram(
         vmax=max_db,
         cmap=palette,
     )
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Mel bin")
-    fig.colorbar(img, ax=ax, label="dB")
+    ax_spec.set_xlabel("Time (s)")
+    ax_spec.set_ylabel("Mel bin")
+    cbar = fig.colorbar(img, ax=ax_spec, label="dB")
 
+    legend_handles = []
     if overlay_events:
-        y_positions = np.linspace(n_mels * 0.3, n_mels * 0.9, num=len(overlay_events))
-        for (ev, y_pos) in zip(overlay_events, y_positions):
-            ax.axvspan(ev.start, ev.end, color="white" if ev.stage == "stage1" else "#ffb180", alpha=0.25)
-            ax.text(
+        colors = {"stage1": "#5ad0ff", "stage2": "#ffb180"}
+        y_base = n_mels * 0.1
+        y_step = max(n_mels * 0.05, 3)
+        for idx, ev in enumerate(overlay_events):
+            ypos = min(n_mels * 0.9, y_base + (idx % 5) * y_step)
+            ax_spec.axvspan(ev.start, ev.end, color=colors.get(ev.stage, "#ffffff"), alpha=0.18, linewidth=0)
+            ax_spec.text(
                 (ev.start + ev.end) / 2,
-                y_pos,
+                ypos,
                 f"{ev.label} ({ev.stage})",
                 ha="center",
                 va="center",
                 fontsize=9,
                 color="#e9edff",
-                rotation=0,
-                bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.3, edgecolor="none"),
+                bbox=dict(boxstyle="round,pad=0.25", facecolor="black", alpha=0.4, edgecolor="none"),
             )
+        legend_handles = [
+            plt.Line2D([0], [0], color="#5ad0ff", lw=6, alpha=0.5, label="Stage-1 overlay"),
+            plt.Line2D([0], [0], color="#ffb180", lw=6, alpha=0.5, label="Stage-2 overlay"),
+        ]
+        ax_spec.legend(handles=legend_handles, loc="upper right", framealpha=0.3)
 
-    ax.set_facecolor("#0b0f1a")
+    ax_wav.set_facecolor("#0b0f1a")
+    ax_spec.set_facecolor("#0b0f1a")
     fig.patch.set_facecolor("#0b0f1a")
     fig.tight_layout()
     return fig
