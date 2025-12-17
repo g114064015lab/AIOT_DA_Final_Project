@@ -289,12 +289,11 @@ def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
         .add_selection(sel)
     )
 
-    wedges = base.mark_arc(innerRadius=60, stroke="white", strokeWidth=1.0).encode(
-        outerRadius=alt.condition(sel, alt.value(180), alt.value(140)),
-        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.65)),
+    wedges = base.mark_arc(stroke="white", strokeWidth=1.0).encode(
+        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.65))
     )
     texts = base.mark_text(fontSize=9, color="#e9edff").encode(
-        radius=alt.value(195),
+        radius=alt.value(120),
         text="label:N",
         opacity=alt.condition(sel, alt.value(1.0), alt.value(0.45)),
     )
