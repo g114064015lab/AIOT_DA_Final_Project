@@ -592,78 +592,79 @@ def main() -> None:
             """
         )
         svg_arch = """
-<svg width="100%" height="360" viewBox="0 0 1080 360" xmlns="http://www.w3.org/2000/svg">
+<svg width="100%" height="420" viewBox="0 0 1180 420" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradA" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2e4cff" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#24c4ff" stop-opacity="0.9"/>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ea1ff"/>
+      <stop offset="100%" stop-color="#7dd8ff"/>
     </linearGradient>
-    <linearGradient id="gradB" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f26666" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#f8b46b" stop-opacity="0.9"/>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9f71"/>
+      <stop offset="100%" stop-color="#ffcba2"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="rgba(0,0,0,0.35)"/>
+    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="rgba(0,0,0,0.35)"/>
     </filter>
-    <marker id="ah" markerWidth="12" markerHeight="10" refX="6" refY="5" orient="auto">
-      <polygon points="0 0, 12 5, 0 10" fill="rgba(255,255,255,0.8)" />
+    <marker id="arrowHead" markerWidth="14" markerHeight="10" refX="7" refY="5" orient="auto">
+      <polygon points="0 0, 14 5, 0 10" fill="rgba(255,255,255,0.85)" />
     </marker>
   </defs>
   <style>
-    .node { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.22); stroke-width:1.5; filter:url(#shadow);}
-    .label { fill: #e8ecff; font-size: 16px; font-family: 'Space Grotesk','Segoe UI',sans-serif; font-weight:700; }
-    .sub { fill: #cfd8ff; font-size: 13px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
-    .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2.4; marker-end: url(#ah); }
-    .pillA { fill: url(#gradA); }
-    .pillB { fill: url(#gradB); }
+    .card { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.22); stroke-width:1.6; rx:16; ry:16; filter:url(#cardShadow);}
+    .title { fill: #e9edff; font-size: 18px; font-family: 'Space Grotesk','Segoe UI',sans-serif; font-weight:700; }
+    .desc { fill: #cdd5ff; font-size: 14px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
+    .badgeBlue { fill: url(#blueGrad); }
+    .badgeOrange { fill: url(#orangeGrad); }
+    .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2.6; marker-end: url(#arrowHead); }
   </style>
 
-  <!-- Nodes -->
-  <rect x="60"  y="125" rx="16" ry="16" width="170" height="110" class="node"/>
-  <rect x="280" y="60"  rx="16" ry="16" width="190" height="90"  class="node"/>
-  <rect x="280" y="200" rx="16" ry="16" width="190" height="90"  class="node"/>
-  <rect x="520" y="125" rx="16" ry="16" width="170" height="110" class="node"/>
-  <rect x="740" y="60"  rx="16" ry="16" width="190" height="90"  class="node"/>
-  <rect x="740" y="200" rx="16" ry="16" width="190" height="90"  class="node"/>
+  <!-- Source -->
+  <rect x="40" y="150" width="170" height="120" class="card"/>
+  <rect x="60" y="165" width="46" height="20" rx="10" class="badgeBlue"/>
+  <text x="60" y="205" class="title">PyAudio</text>
+  <text x="60" y="230" class="desc">ffmpeg capture</text>
 
-  <!-- Pills -->
-  <rect x="75"  y="140" rx="10" ry="10" width="40" height="18" class="pillA"/>
-  <rect x="295" y="75"  rx="10" ry="10" width="40" height="18" class="pillA"/>
-  <rect x="295" y="215" rx="10" ry="10" width="40" height="18" class="pillB"/>
-  <rect x="535" y="140" rx="10" ry="10" width="40" height="18" class="pillB"/>
-  <rect x="755" y="75"  rx="10" ry="10" width="40" height="18" class="pillA"/>
-  <rect x="755" y="215" rx="10" ry="10" width="40" height="18" class="pillB"/>
+  <!-- Librosa -->
+  <rect x="260" y="70" width="200" height="100" class="card"/>
+  <rect x="280" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
+  <text x="280" y="125" class="title">Librosa</text>
+  <text x="280" y="150" class="desc">Feature extract / slice</text>
 
-  <!-- Text -->
-  <text x="120" y="180" class="label">PyAudio</text>
-  <text x="120" y="205" class="sub">ffmpeg stream</text>
+  <!-- Stage1 CNN -->
+  <rect x="260" y="220" width="200" height="100" class="card"/>
+  <rect x="280" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
+  <text x="280" y="275" class="title">Stage-1 CNN</text>
+  <text x="280" y="300" class="desc">Segment edge detect</text>
 
-  <text x="330" y="105" class="label">Librosa</text>
-  <text x="330" y="130" class="sub">Feature extract / slice</text>
+  <!-- Redis -->
+  <rect x="520" y="145" width="200" height="120" class="card"/>
+  <rect x="540" y="160" width="46" height="20" rx="10" class="badgeOrange"/>
+  <text x="540" y="200" class="title">Redis Buffer</text>
+  <text x="540" y="225" class="desc">Feature/logits cache</text>
 
-  <text x="330" y="245" class="label">Stage-1 CNN</text>
-  <text x="330" y="270" class="sub">Segment edge detect</text>
+  <!-- Transformer -->
+  <rect x="780" y="70" width="200" height="100" class="card"/>
+  <rect x="800" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
+  <text x="800" y="125" class="title">Transformer</text>
+  <text x="800" y="150" class="desc">Sequence refine</text>
 
-  <text x="570" y="180" class="label">Redis Buffer</text>
-  <text x="570" y="205" class="sub">Feature / logits cache</text>
-
-  <text x="790" y="105" class="label">Transformer</text>
-  <text x="790" y="130" class="sub">Sequence refine</text>
-
-  <text x="790" y="245" class="label">Inference Service</text>
-  <text x="790" y="270" class="sub">Alerts / API</text>
+  <!-- Inference -->
+  <rect x="780" y="220" width="200" height="100" class="card"/>
+  <rect x="800" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
+  <text x="800" y="275" class="title">Inference Service</text>
+  <text x="800" y="300" class="desc">Alerts / API</text>
 
   <!-- Arrows -->
-  <line x1="230" y1="180" x2="280" y2="105" class="arrow"/>
-  <line x1="230" y1="180" x2="280" y2="245" class="arrow"/>
-  <line x1="470" y1="105" x2="520" y2="180" class="arrow"/>
-  <line x1="470" y1="245" x2="520" y2="180" class="arrow"/>
-  <line x1="690" y1="180" x2="740" y2="105" class="arrow"/>
-  <line x1="690" y1="180" x2="740" y2="245" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="135" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="270" class="arrow"/>
+  <line x1="460" y1="135" x2="520" y2="205" class="arrow"/>
+  <line x1="460" y1="270" x2="520" y2="205" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="135" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="270" class="arrow"/>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
-        st.caption("GUARD Pipeline — 以向量風格重現 Arch 流程，可替換文字節點與連接")
+        st.caption("GUARD Pipeline — 逐節點顯示來源、前處理、兩階段模型、緩衝與服務")
 
 
 if __name__ == "__main__":
