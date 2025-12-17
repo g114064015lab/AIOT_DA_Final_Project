@@ -655,12 +655,12 @@ def main() -> None:
   <text x="800" y="300" class="desc">Alerts / API</text>
 
   <!-- Arrows -->
-  <line x1="210" y1="210" x2="230" y2="135" class="arrow"/>
-  <line x1="210" y1="210" x2="230" y2="270" class="arrow"/>
-  <line x1="460" y1="135" x2="500" y2="205" class="arrow"/>
-  <line x1="460" y1="270" x2="500" y2="205" class="arrow"/>
-  <line x1="720" y1="205" x2="760" y2="135" class="arrow"/>
-  <line x1="720" y1="205" x2="760" y2="270" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="135" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="270" class="arrow"/>
+  <line x1="460" y1="135" x2="520" y2="205" class="arrow"/>
+  <line x1="460" y1="270" x2="520" y2="205" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="135" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="270" class="arrow"/>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
