@@ -204,7 +204,8 @@ def build_waterfall_spectrogram(
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
     max_db = 0.0
-    min_db = max(-80.0, float(np.percentile(S_dB, 5)))
+    # 拉高對比：以 1% 分位數為下限，但不低於 -70 dB
+    min_db = max(-70.0, float(np.percentile(S_dB, 1)))
 
     fig, ax = plt.subplots(figsize=(10, 5))
     img = ax.imshow(
@@ -221,8 +222,12 @@ def build_waterfall_spectrogram(
     ax.set_title("Waterfall (Log-Mel, dB)", color="#e9edff")
     ax.set_xlim(times.min(), times.max())
     ax.set_ylim(0, n_mels)
+    ax.set_xticks(np.linspace(times.min(), times.max(), 9))
+    ax.set_yticks(np.linspace(0, n_mels, 9))
+    ax.tick_params(colors="#cfd5ff")
     ax.grid(alpha=0.15, color="gray")
     cbar = fig.colorbar(img, ax=ax, label="dB")
+    cbar.ax.tick_params(colors="#cfd5ff")
 
     if overlay_events:
         for idx, ev in enumerate(overlay_events):
