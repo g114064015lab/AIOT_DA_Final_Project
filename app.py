@@ -190,7 +190,7 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
     )
 
 
-def build_altair_spectrogram(
+def build_waterfall_spectrogram(
     y: np.ndarray,
     sr: int,
     hop_length: int,
@@ -198,74 +198,48 @@ def build_altair_spectrogram(
     palette: str,
     dyn_range: float,
     overlay_events: List[DetectionEvent] | None = None,
-) -> alt.Chart:
-    """Altair-based log-mel spectrogram with hover, dynamic range, and event overlays."""
+) -> plt.Figure:
+    """Matplotlib-based waterfall spectrogram with event labels."""
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
     S_dB = librosa.power_to_db(mel, ref=np.max)
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
     max_db = float(np.max(S_dB))
     min_db = max_db - dyn_range
 
-    df = pd.DataFrame(S_dB)
-    df["mel_bin"] = np.arange(S_dB.shape[0])
-    df_long = df.melt(id_vars="mel_bin", var_name="frame", value_name="dB")
-    df_long["time"] = df_long["frame"].map(lambda i: float(times[int(i)]))
-
-    heat = (
-        alt.Chart(df_long)
-        .mark_rect()
-        .encode(
-            x=alt.X("time:Q", title="Time (s)"),
-            y=alt.Y("mel_bin:O", title="Mel bin"),
-            color=alt.Color("dB:Q", scale=alt.Scale(scheme=palette, domain=[min_db, max_db]), title="dB"),
-            tooltip=[
-                alt.Tooltip("time:Q", title="Time (s)", format=".2f"),
-                alt.Tooltip("mel_bin:O", title="Mel bin"),
-                alt.Tooltip("dB:Q", title="dB", format=".1f"),
-            ],
-        )
-        .properties(height=420)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    img = ax.imshow(
+        S_dB,
+        origin="lower",
+        aspect="auto",
+        extent=[times.min(), times.max(), 0, n_mels],
+        vmin=min_db,
+        vmax=max_db,
+        cmap=palette,
     )
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Mel bin")
+    fig.colorbar(img, ax=ax, label="dB")
 
-    layers = [heat]
     if overlay_events:
-        overlay_df = []
-        for ev in overlay_events:
-            overlay_df.append(
-                {
-                    "start": ev.start,
-                    "end": ev.end,
-                    "label": ev.label,
-                    "stage": ev.stage,
-                    "color": "rgba(255,255,255,0.18)" if ev.stage == "stage1" else "rgba(255,180,120,0.22)",
-                }
+        y_positions = np.linspace(n_mels * 0.3, n_mels * 0.9, num=len(overlay_events))
+        for (ev, y_pos) in zip(overlay_events, y_positions):
+            ax.axvspan(ev.start, ev.end, color="white" if ev.stage == "stage1" else "#ffb180", alpha=0.25)
+            ax.text(
+                (ev.start + ev.end) / 2,
+                y_pos,
+                f"{ev.label} ({ev.stage})",
+                ha="center",
+                va="center",
+                fontsize=9,
+                color="#e9edff",
+                rotation=0,
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.3, edgecolor="none"),
             )
-        overlay = (
-            alt.Chart(pd.DataFrame(overlay_df))
-            .mark_rect()
-            .encode(
-                x="start:Q",
-                x2="end:Q",
-                y=alt.value(0),
-                y2=alt.value(n_mels * 1.0),
-                color=alt.Color("color:N", legend=None),
-                tooltip=[
-                    alt.Tooltip("label:N", title="Label"),
-                    alt.Tooltip("stage:N", title="Stage"),
-                    alt.Tooltip("start:Q", title="Start (s)", format=".2f"),
-                    alt.Tooltip("end:Q", title="End (s)", format=".2f"),
-                ],
-            )
-        )
-        labels = (
-            alt.Chart(pd.DataFrame(overlay_df))
-            .mark_text(baseline="top", dy=2, color="#e9edff", fontSize=10)
-            .encode(x="start:Q", text="label:N")
-        )
-        layers.extend([overlay, labels])
 
-    chart = alt.layer(*layers).configure_view(stroke=None)
-    return chart
+    ax.set_facecolor("#0b0f1a")
+    fig.patch.set_facecolor("#0b0f1a")
+    fig.tight_layout()
+    return fig
 
 
 def sample_geo_events() -> pd.DataFrame:
@@ -527,8 +501,8 @@ def main() -> None:
                 n_mels_opt = st.slider("Mel bins (n_mels)", 32, 128, 64, 8)
                 palette = st.selectbox(
                     "色階",
-                    ["inferno", "magma", "viridis", "plasma", "turbo", "cividis"],
-                    index=4,
+                    ["magma", "inferno", "turbo", "plasma", "viridis", "cividis"],
+                    index=2,
                 )
             with col_cfg2:
                 overlay_opts = st.multiselect(
@@ -544,7 +518,7 @@ def main() -> None:
                 overlay_list.extend(stage1_events)
             if "Stage2" in overlay_opts:
                 overlay_list.extend(refined_events)
-            chart = build_altair_spectrogram(
+            fig = build_waterfall_spectrogram(
                 audio_np,
                 sr,
                 hop_length=hop_length,
@@ -553,7 +527,7 @@ def main() -> None:
                 dyn_range=dyn_range,
                 overlay_events=overlay_list,
             )
-            st.altair_chart(chart, use_container_width=True)
+            st.pyplot(fig, clear_figure=True, use_container_width=True)
 
         st.markdown("**事件時間軸 (Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
