@@ -253,57 +253,94 @@ def build_waterfall_spectrogram(
 
 
 def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
-    """Interactive Coxcomb (Altair) showing event duration share; hover to highlight."""
+    """Donut chart (matplotlib) styled like slide template, showing duration share."""
+    fig, ax = plt.subplots(figsize=(6.5, 4.5), subplot_kw=dict(aspect="equal"))
+    fig.patch.set_facecolor("#0b0f1a")
+    ax.set_facecolor("#0b0f1a")
+
     if not events:
-        return (
-            alt.Chart(pd.DataFrame({"text": ["No events"]}))
-            .mark_text(size=16, color="#e9edff")
-            .encode(text="text")
-            .properties(width=320, height=220)
-            .configure_view(stroke=None)
-        )
+        ax.text(0.5, 0.5, "No events", ha="center", va="center", color="#e9edff", fontsize=14)
+        ax.axis("off")
+        return fig
 
     agg: dict[str, float] = {}
     for ev in events:
         agg[ev.label] = agg.get(ev.label, 0.0) + max(ev.end - ev.start, 0.0)
 
-    df = pd.DataFrame(
-        [
-            {"label": k, "duration": v, "pct": v / sum(agg.values()) * 100.0}
-            for k, v in agg.items()
-        ]
+    labels = list(agg.keys())
+    durations = np.array([agg[k] for k in labels], dtype=float)
+    total = durations.sum()
+    if total <= 0:
+        durations = np.ones_like(durations)
+        total = durations.sum()
+    pct = durations / total * 100
+
+    # highlight the largest slice
+    max_idx = int(np.argmax(durations))
+    highlight_color = "#5b9bff"
+    base_colors = ["#9ea7b1", "#b9c2cc", "#7a7f87", "#cfd5de", "#8a939d", "#d7dde6"]
+    colors = []
+    for i in range(len(labels)):
+        colors.append(highlight_color if i == max_idx else base_colors[i % len(base_colors)])
+    explode = [0.08 if i == max_idx else 0.02 for i in range(len(labels))]
+
+    wedges, texts, autotexts = ax.pie(
+        durations,
+        labels=None,
+        explode=explode,
+        colors=colors,
+        startangle=120,
+        shadow=False,
+        wedgeprops={"edgecolor": "#0b0f1a", "linewidth": 1.0},
+        autopct=lambda p: f"{p:.0f}%" if p >= 5 else "",
+        pctdistance=0.78,
+    )
+    # Draw donut hole
+    circle = plt.Circle((0, 0), 0.55, color="#0b0f1a")
+    ax.add_artist(circle)
+
+    # center text showing top share
+    ax.text(
+        0,
+        0.05,
+        f"{pct[max_idx]:.0f}%",
+        ha="center",
+        va="center",
+        fontsize=32,
+        fontweight="bold",
+        color=highlight_color,
+    )
+    ax.text(
+        0,
+        -0.12,
+        labels[max_idx],
+        ha="center",
+        va="center",
+        fontsize=12,
+        color="#e9edff",
     )
 
-    sel = alt.selection_single(fields=["label"], empty="all", on="mouseover")
-    base = (
-        alt.Chart(df)
-        .encode(
-            theta=alt.Theta("duration:Q", stack=True),
-            color=alt.Color("label:N", legend=None, scale=alt.Scale(scheme="tableau20")),
-            tooltip=[
-                alt.Tooltip("label:N", title="Label"),
-                alt.Tooltip("duration:Q", title="Duration (s)", format=".2f"),
-                alt.Tooltip("pct:Q", title="Share (%)", format=".1f"),
-            ],
+    # side labels
+    for i, (w, lab, p) in enumerate(zip(wedges, labels, pct)):
+        ang = (w.theta2 + w.theta1) / 2.0
+        x = np.cos(np.deg2rad(ang))
+        y = np.sin(np.deg2rad(ang))
+        ha = "left" if x > 0 else "right"
+        ax.text(
+            1.15 * x,
+            1.15 * y,
+            f"{lab} ({p:.0f}%)",
+            ha=ha,
+            va="center",
+            fontsize=10,
+            color="#e9edff",
         )
-        .add_selection(sel)
-    )
 
-    wedges = base.mark_arc(stroke="white", strokeWidth=1.0).encode(
-        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.65))
-    )
-    texts = base.mark_text(fontSize=9, color="#e9edff").encode(
-        radius=alt.value(120),
-        text="label:N",
-        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.45)),
-    )
-    chart = (wedges + texts).properties(width=440, height=440, title="Event Duration Share (Stage-2)")
-    chart = (
-        chart.configure_view(stroke=None)
-        .configure_title(color="#e9edff", fontSize=16)
-        .configure_axis(labelColor="#e9edff", titleColor="#e9edff")
-    )
-    return chart
+    plt.setp(texts, size=0)  # hide default labels
+    plt.setp(autotexts, size=0)  # hide default autopct text; side labels used instead
+    ax.set_title("Event Duration Share (Stage-2)", fontsize=14, color="#e9edff", pad=12)
+    ax.axis("equal")
+    return fig
 
 
 def load_loudest_sample(samples_dir: pathlib.Path) -> Tuple[np.ndarray, int] | None:
@@ -375,7 +412,10 @@ def main() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            background: radial-gradient(120% 120% at 10% 20%, #0e1424 0%, #090f1d 35%, #050915 75%);
+            background:
+              radial-gradient(140% 140% at 15% 20%, rgba(15,22,40,0.9) 0%, rgba(8,12,24,0.95) 45%, #050915 80%),
+              repeating-linear-gradient(115deg, rgba(255,215,130,0.08) 0, rgba(255,215,130,0.08) 2px, transparent 2px, transparent 14px),
+              repeating-linear-gradient(205deg, rgba(255,235,170,0.05) 0, rgba(255,235,170,0.05) 1px, transparent 1px, transparent 18px);
             color: #e7ecff;
         }
         .hero {
