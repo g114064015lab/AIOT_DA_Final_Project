@@ -207,6 +207,9 @@ def build_waterfall_spectrogram(
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Level (dB, rel.)")
     ax.set_ylim(min_db, 3)
+    ax.set_xlim(times.min(), times.max())
+    ax.xaxis.set_major_locator(plt.MaxNLocator(10))
+    ax.yaxis.set_major_locator(plt.MaxNLocator(8))
     ax.grid(alpha=0.2, color="gray")
 
     if overlay_events:
