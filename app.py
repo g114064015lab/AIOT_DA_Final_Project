@@ -410,7 +410,7 @@ def main() -> None:
         m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
         st.markdown("**Top Events (可調整顯示數量)**")
         top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
-        render_event_chips(refined_events or stage1_events, top_k=top_k)
+        
 
         if allow_download and refined_events:
             csv_buffer = io.StringIO()
