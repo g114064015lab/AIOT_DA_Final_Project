@@ -618,6 +618,16 @@ def main() -> None:
     .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2; marker-end: url(#arrowHead); }
   </style>
 
+  <!-- Arrows beneath nodes -->
+  <line x1="210" y1="210" x2="260" y2="125" class="arrow"/>
+  <line x1="210" y1="210" x2="260" y2="280" class="arrow"/>
+  <line x1="460" y1="125" x2="520" y2="205" class="arrow"/>
+  <line x1="460" y1="280" x2="520" y2="205" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="125" class="arrow"/>
+  <line x1="720" y1="205" x2="780" y2="280" class="arrow"/>
+
+  <!-- Nodes on top -->
+  <g>
   <!-- Source -->
   <rect x="40" y="150" width="170" height="120" class="card"/>
   <rect x="60" y="165" width="46" height="20" rx="10" class="badgeBlue"/>
@@ -653,14 +663,7 @@ def main() -> None:
   <rect x="800" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
   <text x="800" y="275" class="title">🚀 Inference Service</text>
   <text x="800" y="300" class="desc">Alerts / API</text>
-
-  <!-- Arrows -->
-  <line x1="210" y1="210" x2="260" y2="125" class="arrow"/>
-  <line x1="210" y1="210" x2="260" y2="280" class="arrow"/>
-  <line x1="460" y1="125" x2="520" y2="205" class="arrow"/>
-  <line x1="460" y1="280" x2="520" y2="205" class="arrow"/>
-  <line x1="720" y1="205" x2="780" y2="125" class="arrow"/>
-  <line x1="720" y1="205" x2="780" y2="280" class="arrow"/>
+  </g>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
