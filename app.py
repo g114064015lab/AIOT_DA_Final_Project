@@ -189,11 +189,11 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
     )
 
 
-def render_event_chips(events: List[DetectionEvent]) -> None:
+def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
     if not events:
         st.info("尚無事件，請上傳音訊或使用範例。")
         return
-    top_events = sorted(events, key=lambda e: e.score, reverse=True)[:6]
+    top_events = sorted(events, key=lambda e: e.score, reverse=True)[:top_k]
     chip_html = []
     for ev in top_events:
         chip_html.append(
@@ -233,6 +233,7 @@ def main() -> None:
             border-radius: 16px;
             color: #f6f8ff;
             box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.12);
         }
         .badge {
             display:inline-block;
@@ -262,7 +263,12 @@ def main() -> None:
             border-radius: 14px;
             padding: 10px 12px;
             min-width: 180px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+            transition: all 200ms ease;
+        }
+        .chip:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.22);
         }
         .chip-label {
             font-weight:700;
@@ -367,8 +373,9 @@ def main() -> None:
     m1.metric("Stage-1 事件數", total_stage1)
     m2.metric("Stage-2 事件數", total_stage2)
     m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
-    st.markdown("**Top Events**")
-    render_event_chips(refined_events or stage1_events)
+    st.markdown("**Top Events (可調整顯示數量)**")
+    top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
+    render_event_chips(refined_events or stage1_events, top_k=top_k)
 
     if allow_download and refined_events:
         csv_buffer = io.StringIO()
