@@ -592,7 +592,7 @@ def main() -> None:
             """
         )
         svg_arch = """
-<svg width="100%" height="420" viewBox="0 0 1180 420" xmlns="http://www.w3.org/2000/svg">
+<svg width="100%" height="520" viewBox="0 0 1180 520" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4ea1ff"/>
