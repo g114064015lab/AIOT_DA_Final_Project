@@ -31,6 +31,12 @@
 - 依硬體：CPU 即時推論需優化；如可用 GPU/TPU 則啟用加速。
 - 依服務：本地 Redis（可選）；雲端部署需設定網路與安全組。
 
+## Streamlit 互動 Demo
+- 依據 `requirements.txt` 安裝相依後執行：`streamlit run app.py`
+- 側邊欄可調整取樣率、frame/hop、Stage-1 閾值、Stage-2 平滑參數；可上傳音檔或使用合成範例。
+- Demo 目前內建示意模型（啟發式），請在 `app.py` 中替換為 TorchScript/ONNX CNN 與 Transformer/CRNN，即可接軌真實架構。
+- 詳細說明請見 `STREAMLIT.md`。
+
 ### 安裝範例（本地開發）
 ```bash
 python -m venv .venv
