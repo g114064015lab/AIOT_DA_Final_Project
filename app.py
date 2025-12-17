@@ -259,7 +259,7 @@ def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
             alt.Chart(pd.DataFrame({"text": ["No events"]}))
             .mark_text(size=16, color="#e9edff")
             .encode(text="text")
-            .properties(width=300, height=200)
+            .properties(width=320, height=220)
             .configure_view(stroke=None)
         )
 
@@ -274,12 +274,12 @@ def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
         ]
     )
 
-    sel = alt.selection_single(fields=["label"], empty="all")
+    sel = alt.selection_single(fields=["label"], empty="all", on="mouseover")
     base = (
         alt.Chart(df)
         .encode(
             theta=alt.Theta("duration:Q", stack=True),
-            color=alt.Color("label:N", legend=None),
+            color=alt.Color("label:N", legend=None, scale=alt.Scale(scheme="tableau20")),
             tooltip=[
                 alt.Tooltip("label:N", title="Label"),
                 alt.Tooltip("duration:Q", title="Duration (s)", format=".2f"),
@@ -289,14 +289,19 @@ def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
         .add_selection(sel)
     )
 
-    wedges = base.mark_arc(innerRadius=40, outerRadius=120, stroke="white", strokeWidth=1).encode(
-        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.5))
+    wedges = base.mark_arc(innerRadius=50, stroke="white", strokeWidth=1.2).encode(
+        outerRadius=alt.condition(sel, alt.value(150), alt.value(120)),
+        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.65)),
     )
-    texts = base.mark_text(radius=140, fontSize=10, color="#e9edff").encode(
-        text="label:N", opacity=alt.condition(sel, alt.value(1.0), alt.value(0.6))
+    texts = base.mark_text(radius=175, fontSize=10, color="#e9edff").encode(
+        text="label:N", opacity=alt.condition(sel, alt.value(1.0), alt.value(0.5))
     )
-    chart = (wedges + texts).properties(width=360, height=360, title="Event Duration Share (Coxcomb)")
-    chart = chart.configure_view(stroke=None).configure_title(color="#e9edff")
+    chart = (wedges + texts).properties(width=420, height=420, title="Event Duration Share (Coxcomb)")
+    chart = (
+        chart.configure_view(stroke=None)
+        .configure_title(color="#e9edff", fontSize=16)
+        .configure_axis(labelColor="#e9edff", titleColor="#e9edff")
+    )
     return chart
 
 
