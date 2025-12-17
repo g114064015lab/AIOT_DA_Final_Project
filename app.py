@@ -455,6 +455,45 @@ def main() -> None:
             font-weight:800;
             font-size:20px;
             letter-spacing:-0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-icon::before, .logo-icon::after {
+            content:"";
+            position:absolute;
+            inset:0;
+            background: linear-gradient(135deg, rgba(255,215,150,0.28) 0%, rgba(255,215,150,0.0) 60%);
+            mix-blend-mode: screen;
+            transform: skewX(-10deg);
+        }
+        .logo-icon::after {
+            background: repeating-linear-gradient(90deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 6px, rgba(255,255,255,0.18) 6px, rgba(255,255,255,0.18) 8px);
+            opacity:0.5;
+            mix-blend-mode: soft-light;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+        .logo-wave {
+            position:absolute;
+            width:120%;
+            height:120%;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.45), transparent 45%);
+            opacity:0.35;
+            transform: translateX(-20%) skewX(-12deg);
+            animation: wave 3s ease-in-out infinite;
+        }
+        .logo-icon span {
+            position:relative;
+            z-index:1;
+        }
+        @keyframes wave {
+            0% { transform: translateX(-25%) skewX(-12deg); opacity:0.35; }
+            50% { transform: translateX(15%) skewX(-12deg); opacity:0.55; }
+            100% { transform: translateX(-25%) skewX(-12deg); opacity:0.35; }
+        }
+        @keyframes pulse {
+            0% { opacity:0.3; }
+            50% { opacity:0.65; }
+            100% { opacity:0.3; }
         }
         .logo-text {
             font-size:22px;
@@ -551,7 +590,7 @@ def main() -> None:
         """
     <div class="hero">
       <div class="logo-wrap">
-        <div class="logo-icon">G</div>
+        <div class="logo-icon"><div class="logo-wave"></div><span>G</span></div>
         <div class="logo-text">GUARD · General Urban Audio Recognition & Defense</div>
       </div>
       <h2 style="margin:12px 0 6px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
