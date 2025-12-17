@@ -194,69 +194,39 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
 def build_waterfall_spectrogram(
     y: np.ndarray,
     sr: int,
-    hop_length: int,
-    n_mels: int,
-    palette: str,
-    dyn_range: float,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Waveform + waterfall spectrogram with clear Stage1/Stage2 overlays and legend."""
-    mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
-    S_dB = librosa.power_to_db(mel, ref=np.max)
-    times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
-    max_db = float(np.max(S_dB))
-    min_db = max_db - dyn_range
-    t_wav = np.arange(len(y)) / sr
-
-    fig, (ax_wav, ax_spec) = plt.subplots(
-        2, 1, figsize=(10, 6), sharex=True, gridspec_kw={"height_ratios": [1, 4]}
-    )
-
-    # Waveform overview
-    ax_wav.plot(t_wav, y, color="#7dd8ff", linewidth=0.8)
-    ax_wav.set_ylabel("Amp")
-    ax_wav.set_yticks([])
-    ax_wav.grid(alpha=0.2)
-
-    img = ax_spec.imshow(
-        S_dB,
-        origin="lower",
-        aspect="auto",
-        extent=[times.min(), times.max(), 0, n_mels],
-        vmin=min_db,
-        vmax=max_db,
-        cmap=palette,
-    )
-    ax_spec.set_xlabel("Time (s)")
-    ax_spec.set_ylabel("Mel bin")
-    cbar = fig.colorbar(img, ax=ax_spec, label="dB")
+    """Waveform-only visualization with Stage1/Stage2 overlays and legend."""
+    t = np.arange(len(y)) / sr
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(t, y, color="#7dd8ff", linewidth=0.9)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Amplitude")
+    ax.grid(alpha=0.2)
 
     legend_handles = []
     if overlay_events:
         colors = {"stage1": "#5ad0ff", "stage2": "#ffb180"}
-        y_base = n_mels * 0.1
-        y_step = max(n_mels * 0.05, 3)
-        for idx, ev in enumerate(overlay_events):
-            ypos = min(n_mels * 0.9, y_base + (idx % 5) * y_step)
-            ax_spec.axvspan(ev.start, ev.end, color=colors.get(ev.stage, "#ffffff"), alpha=0.18, linewidth=0)
-            ax_spec.text(
+        y_base = (np.max(y) - np.min(y)) * 0.05
+        for ev in overlay_events:
+            ax.axvspan(ev.start, ev.end, color=colors.get(ev.stage, "#ffffff"), alpha=0.2, linewidth=0)
+            ax.text(
                 (ev.start + ev.end) / 2,
-                ypos,
+                y_base + np.max(y) * 0.05,
                 f"{ev.label} ({ev.stage})",
                 ha="center",
-                va="center",
+                va="bottom",
                 fontsize=9,
                 color="#e9edff",
-                bbox=dict(boxstyle="round,pad=0.25", facecolor="black", alpha=0.4, edgecolor="none"),
+                bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.35, edgecolor="none"),
             )
         legend_handles = [
             plt.Line2D([0], [0], color="#5ad0ff", lw=6, alpha=0.5, label="Stage-1 overlay"),
             plt.Line2D([0], [0], color="#ffb180", lw=6, alpha=0.5, label="Stage-2 overlay"),
         ]
-        ax_spec.legend(handles=legend_handles, loc="upper right", framealpha=0.3)
+        ax.legend(handles=legend_handles, loc="upper right", framealpha=0.3)
 
-    ax_wav.set_facecolor("#0b0f1a")
-    ax_spec.set_facecolor("#0b0f1a")
+    ax.set_facecolor("#0b0f1a")
     fig.patch.set_facecolor("#0b0f1a")
     fig.tight_layout()
     return fig
@@ -516,23 +486,9 @@ def main() -> None:
 
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
-            col_cfg1, col_cfg2, col_cfg3 = st.columns([2, 1, 1])
-            with col_cfg1:
-                n_mels_opt = st.slider("Mel bins (n_mels)", 32, 128, 64, 8)
-                palette = st.selectbox(
-                    "色階",
-                    ["magma", "inferno", "turbo", "plasma", "viridis", "cividis"],
-                    index=2,
-                )
-            with col_cfg2:
-                overlay_opts = st.multiselect(
-                    "覆蓋事件區間",
-                    ["Stage1", "Stage2"],
-                    default=["Stage2"],
-                )
-            with col_cfg3:
-                dyn_range = st.slider("動態範圍 (dB)", 30, 90, 60, 5)
-
+            overlay_opts = st.multiselect(
+                "覆蓋事件區間", ["Stage1", "Stage2"], default=["Stage2", "Stage1"]
+            )
             overlay_list: List[DetectionEvent] = []
             if "Stage1" in overlay_opts:
                 overlay_list.extend(stage1_events)
@@ -541,10 +497,6 @@ def main() -> None:
             fig = build_waterfall_spectrogram(
                 audio_np,
                 sr,
-                hop_length=hop_length,
-                n_mels=n_mels_opt,
-                palette=palette,
-                dyn_range=dyn_range,
                 overlay_events=overlay_list,
             )
             st.pyplot(fig, clear_figure=True, use_container_width=True)
