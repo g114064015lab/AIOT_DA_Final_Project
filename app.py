@@ -517,7 +517,7 @@ def main() -> None:
             "siren": [90, 180, 255],
             "scream": [160, 120, 255],
         }
-        filtered["color"] = filtered["class"].map(color_map).fillna([200, 200, 200])
+        filtered["color"] = filtered["class"].apply(lambda c: color_map.get(c, [200, 200, 200]))
         filtered["elevation"] = (filtered["score"] * height_scale).astype(float)
 
         midpoint = [filtered["lat"].mean(), filtered["lon"].mean()] if not filtered.empty else [25.04, 121.56]
