@@ -491,17 +491,17 @@ def main() -> None:
         """,
         unsafe_allow_html=True,
     )
-        st.markdown(
-            """
-        <div class="hero">
-          <div class="badge" style="padding:10px 16px;font-size:15px;">GUARD · General Urban Audio Recognition & Defense</div>
-          <h2 style="margin:14px 0 8px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
-          <p style="margin:0;font-size:16px;font-weight:600;">GUARD: The City Never Sleeps, Neither Do We.</p>
-          <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
+    st.markdown(
+        """
+    <div class="hero">
+      <div class="badge" style="padding:10px 16px;font-size:15px;">GUARD · General Urban Audio Recognition & Defense</div>
+      <h2 style="margin:14px 0 8px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
+      <p style="margin:0;font-size:16px;font-weight:600;">GUARD: The City Never Sleeps, Neither Do We.</p>
+      <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
+    </div>
+    """,
+        unsafe_allow_html=True,
+    )
 
     tabs = ["Products", "Applications", "Case Studies", "Support", "Architecture"]
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
