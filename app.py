@@ -196,35 +196,33 @@ def build_waterfall_spectrogram(
     sr: int,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Waveform-only visualization with Stage1/Stage2 overlays and legend."""
-    t = np.arange(len(y)) / sr
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(t, y, color="#7dd8ff", linewidth=0.9)
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Amplitude")
-    ax.grid(alpha=0.2)
+    """Waveform-only view with unified event overlays and better dynamic range."""
+    rms = librosa.feature.rms(y=y, frame_length=1024, hop_length=512)[0]
+    times = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=512)
+    db = librosa.amplitude_to_db(rms, ref=np.max)
+    min_db = min(-80.0, float(db.min()))
 
-    legend_handles = []
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(times, db, color="#9fe2ff", linewidth=1.2)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Level (dB, rel.)")
+    ax.set_ylim(min_db, 3)
+    ax.grid(alpha=0.2, color="gray")
+
     if overlay_events:
-        colors = {"stage1": "#5ad0ff", "stage2": "#ffb180"}
-        y_base = (np.max(y) - np.min(y)) * 0.05
-        for ev in overlay_events:
-            ax.axvspan(ev.start, ev.end, color=colors.get(ev.stage, "#ffffff"), alpha=0.2, linewidth=0)
+        color = "#8fd3ff"
+        for idx, ev in enumerate(overlay_events):
+            ax.axvspan(ev.start, ev.end, color=color, alpha=0.2, linewidth=0)
             ax.text(
                 (ev.start + ev.end) / 2,
-                y_base + np.max(y) * 0.05,
-                f"{ev.label} ({ev.stage})",
+                min_db + 5 + (idx % 3) * 3,
+                f"{ev.label}",
                 ha="center",
                 va="bottom",
                 fontsize=9,
                 color="#e9edff",
                 bbox=dict(boxstyle="round,pad=0.2", facecolor="black", alpha=0.35, edgecolor="none"),
             )
-        legend_handles = [
-            plt.Line2D([0], [0], color="#5ad0ff", lw=6, alpha=0.5, label="Stage-1 overlay"),
-            plt.Line2D([0], [0], color="#ffb180", lw=6, alpha=0.5, label="Stage-2 overlay"),
-        ]
-        ax.legend(handles=legend_handles, loc="upper right", framealpha=0.3)
 
     ax.set_facecolor("#0b0f1a")
     fig.patch.set_facecolor("#0b0f1a")
