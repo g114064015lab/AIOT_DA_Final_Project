@@ -498,8 +498,7 @@ def main() -> None:
                 "- 校園/醫院/商場的玻璃破裂與闖入偵測\n"
                 "- 社區夜間巡防：異常撞擊聲、爭吵尖叫\n"
                 "- 智慧建築：機房異音、設備異常噪音預警"
-            """
-        )
+            )
     elif nav == "Case Studies":
         st.subheader("案例示意")
         st.markdown(
