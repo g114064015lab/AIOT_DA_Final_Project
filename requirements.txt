@@ -6,8 +6,8 @@ numpy>=1.26,<2.1
 scipy>=1.11,<1.13
 matplotlib>=3.8,<3.10
 
-# NOTE: torch is omitted here to keep Streamlit Cloud / Python 3.13 deployable.
-# If you train locally (Python 3.10–3.12), install requirements-train.txt instead.
+# For Torch inference/training: use Python 3.10–3.12 (recommended: 3.11) to satisfy wheels.
+torch==2.3.1; python_version < "3.13"
 
 # Optional (install if you wire real models / services)
 # redis>=5.0

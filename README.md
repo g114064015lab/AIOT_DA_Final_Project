@@ -45,16 +45,16 @@
 </details>
 
 ## 快速開始
-1) 建立虛擬環境並安裝相依
+1) 建立虛擬環境並安裝相依（建議 Python 3.11；Streamlit Cloud 可用 `runtime.txt` 指定）
 ```bash
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install --upgrade pip
-pip install -r requirements.txt   # 不含 torch，適合 Streamlit 部署（Python 3.13 亦可）
+pip install -r requirements.txt   # Python 3.11 下會安裝 torch==2.3.1；3.13 會略過 torch
 ```
 2) 確認 ffmpeg 在 PATH（若使用麥克風/轉檔）。
 
-> 如需訓練或接入 Torch 模型，請使用 Python 3.10–3.12 並安裝：`pip install -r requirements-train.txt`
+> 如需訓練或接入 Torch 模型，請使用 Python 3.10–3.12（建議 3.11）並安裝：`pip install -r requirements-train.txt`
 
 ## Streamlit 互動 Demo
 - 執行：`streamlit run app.py`

@@ -8,7 +8,7 @@
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install --upgrade pip
-pip install -r requirements.txt   # 不含 torch，適合 Streamlit 部署
+pip install -r requirements.txt   # 建議 Python 3.11；若用 3.13 會略過 torch
 ```
 2) 安裝 ffmpeg（確保 `ffmpeg` 在 PATH）
 3) 執行 Demo
@@ -40,8 +40,9 @@ streamlit run app.py
 - 告警：在 Stage-2 結果後掛上 Webhook/SMS/Email，加入冷卻時間與去抖動。
 
 ## 部署注意
-- Streamlit Cloud 目前採用 Python 3.13，無官方 torch wheel，故 `requirements.txt` 已移除 torch 依賴。
-- 若需 Torch 推論/訓練，請在本地或自行控管的環境（Python 3.10–3.12）安裝 `requirements-train.txt`。
+- Streamlit Cloud 如需 Torch，請將 Python 設為 3.11（本 repo 提供 `runtime.txt`）。Torch 2.3.1 在 3.11 有官方 wheel。
+- 若仍用 Python 3.13，pip 會略過 torch；可先用內建啟發式偵測跑 UI。
+- 訓練/推論接 Torch：在 Python 3.10–3.12（建議 3.11）安裝 `requirements-train.txt`。
 
 ## 部署建議
 - 開發模式：`streamlit run app.py`，關閉 `--server.runOnSave=false` 以避免自動重啟時中斷推論。
