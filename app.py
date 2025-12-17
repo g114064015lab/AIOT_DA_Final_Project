@@ -332,7 +332,7 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    tabs = ["Products", "Applications", "Case Studies", "Support", "Architecture"]
+    tabs = ["Products", "Applications", "Case Studies", "Support", "Partners"]
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
 
     if nav != "Products":
@@ -530,7 +530,57 @@ def main() -> None:
             - Deployment/Inference Service：輸出事件、警報與 API。
             """
         )
-        st.image("Arch.png", use_column_width=True, caption="GUARD Pipeline")
+        svg_arch = """
+<svg width="100%" height="320" viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .node { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.25); stroke-width:1.4; }
+    .label { fill: #e8ecff; font-size: 15px; font-family: 'Space Grotesk','Segoe UI',sans-serif; font-weight:700; }
+    .sub { fill: #cdd5ff; font-size: 13px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
+    .arrow { stroke: rgba(255,255,255,0.6); stroke-width:2; marker-end: url(#ah); }
+  </style>
+  <defs>
+    <marker id="ah" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="rgba(255,255,255,0.7)" />
+    </marker>
+  </defs>
+  <!-- Nodes -->
+  <rect x="40" y="110" rx="14" ry="14" width="140" height="100" class="node"/>
+  <rect x="220" y="60" rx="14" ry="14" width="170" height="90" class="node"/>
+  <rect x="220" y="190" rx="14" ry="14" width="170" height="90" class="node"/>
+  <rect x="430" y="110" rx="14" ry="14" width="170" height="100" class="node"/>
+  <rect x="640" y="60" rx="14" ry="14" width="170" height="90" class="node"/>
+  <rect x="640" y="190" rx="14" ry="14" width="170" height="90" class="node"/>
+
+  <!-- Text -->
+  <text x="60" y="150" class="label">PyAudio</text>
+  <text x="60" y="175" class="sub">via ffmpeg</text>
+
+  <text x="240" y="95" class="label">Librosa</text>
+  <text x="240" y="120" class="sub">Feature Extract / Slice</text>
+
+  <text x="240" y="225" class="label">PyTorch CNN</text>
+  <text x="240" y="250" class="sub">Segment-level edge</text>
+
+  <text x="450" y="145" class="label">Redis Buffer</text>
+  <text x="450" y="170" class="sub">Feature/logits cache</text>
+
+  <text x="660" y="95" class="label">Transformer</text>
+  <text x="660" y="120" class="sub">Sequence refine</text>
+
+  <text x="660" y="225" class="label">Deployment</text>
+  <text x="660" y="250" class="sub">Inference Service</text>
+
+  <!-- Arrows -->
+  <line x1="180" y1="160" x2="220" y2="115" class="arrow"/>
+  <line x1="180" y1="160" x2="220" y2="225" class="arrow"/>
+  <line x1="390" y1="115" x2="430" y2="150" class="arrow"/>
+  <line x1="390" y1="225" x2="430" y2="170" class="arrow"/>
+  <line x1="600" y1="150" x2="640" y2="110" class="arrow"/>
+  <line x1="600" y1="150" x2="640" y2="235" class="arrow"/>
+</svg>
+"""
+        st.markdown(svg_arch, unsafe_allow_html=True)
+        st.caption("GUARD Pipeline — 可依實際部署替換節點/文字")
 
 
 if __name__ == "__main__":
