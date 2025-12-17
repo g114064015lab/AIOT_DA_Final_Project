@@ -483,6 +483,23 @@ def main() -> None:
             - 人群尖叫/求救：公眾聚集區、地鐵與商場。
             """
         )
+        st.divider()
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown("**交通與城市運維**")
+            st.write(
+                "- 十字路口警笛辨識，提醒信號優先切換\n"
+                "- 公車/地鐵站月台，尖叫/求救觸發安保\n"
+                "- 工地/施工區域，異常爆裂聲即時通報"
+            )
+        with c2:
+            st.markdown("**場域防護與民生**")
+            st.write(
+                "- 校園/醫院/商場的玻璃破裂與闖入偵測\n"
+                "- 社區夜間巡防：異常撞擊聲、爭吵尖叫\n"
+                "- 智慧建築：機房異音、設備異常噪音預警"
+            """
+        )
     elif nav == "Case Studies":
         st.subheader("案例示意")
         st.markdown(
@@ -503,14 +520,63 @@ def main() -> None:
             """
         )
     else:  # Partners
-        st.subheader("合作與整合")
-        st.markdown(
-            """
-            - 與監控平台整合：提供事件 Webhook/REST；可掛上權限與簽名。
-            - OEM / SI：可提供模型導出與邊緣部署最佳化（量化/剪枝）。
-            - 聯絡：請透過專案維護者或內部渠道洽談技術合作。
-            """
-        )
+        st.subheader("合作與整合（示意圖）")
+        st.markdown("以下為合作模式示意，可替換為實際合作夥伴 Logo。")
+        svg = """
+<svg width="100%" height="280" viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .node { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.25); stroke-width:1.2; }
+    .label { fill: #e8ecff; font-size: 13px; font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }
+    .title { fill: #b8c7ff; font-size: 14px; font-weight: 700; }
+    .arrow { stroke: rgba(255,255,255,0.3); stroke-width:1.5; marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="5" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="rgba(255,255,255,0.45)" />
+    </marker>
+  </defs>
+  <rect x="40" y="60" rx="12" ry="12" width="160" height="120" class="node"/>
+  <rect x="240" y="40" rx="12" ry="12" width="140" height="80" class="node"/>
+  <rect x="240" y="150" rx="12" ry="12" width="140" height="80" class="node"/>
+  <rect x="430" y="60" rx="12" ry="12" width="150" height="120" class="node"/>
+  <rect x="630" y="40" rx="12" ry="12" width="130" height="80" class="node"/>
+  <rect x="630" y="150" rx="12" ry="12" width="130" height="80" class="node"/>
+
+  <text x="60" y="90" class="title">City Ops / 公部門</text>
+  <text x="60" y="115" class="label">- 安全中心</text>
+  <text x="60" y="135" class="label">- 警消調度</text>
+  <text x="60" y="155" class="label">- 合規治理</text>
+
+  <text x="255" y="75" class="title">Edge / IoT</text>
+  <text x="255" y="100" class="label">- 麥克風節點</text>
+  <text x="255" y="120" class="label">- Gateway/5G</text>
+
+  <text x="255" y="185" class="title">SI / OEM</text>
+  <text x="255" y="210" class="label">- 整合部署</text>
+  <text x="255" y="230" class="label">- 維運與 SLA</text>
+
+  <text x="450" y="95" class="title">Cloud / GUARD</text>
+  <text x="450" y="120" class="label">- Stage1/2 模型</text>
+  <text x="450" y="140" class="label">- 事件流/監控</text>
+
+  <text x="645" y="70" class="title">Alert</text>
+  <text x="645" y="95" class="label">- Webhook</text>
+  <text x="645" y="115" class="label">- SMS/Email</text>
+
+  <text x="645" y="180" class="title">Partners</text>
+  <text x="645" y="205" class="label">- CCTV / VMS</text>
+  <text x="645" y="225" class="label">- 交通/地鐵</text>
+
+  <line x1="200" y1="120" x2="240" y2="80" class="arrow" />
+  <line x1="200" y1="120" x2="240" y2="190" class="arrow" />
+  <line x1="380" y1="80" x2="430" y2="100" class="arrow" />
+  <line x1="380" y1="190" x2="430" y2="140" class="arrow" />
+  <line x1="580" y1="120" x2="630" y2="80" class="arrow" />
+  <line x1="580" y1="120" x2="630" y2="190" class="arrow" />
+</svg>
+"""
+        st.markdown(svg, unsafe_allow_html=True)
+        st.caption("可替換為實際夥伴 Logo，SVG 位置/標籤皆可自訂。")
 
 
 if __name__ == "__main__":
