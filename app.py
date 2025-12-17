@@ -457,7 +457,7 @@ def main() -> None:
         }
         .logo-letter {
             font-weight:900;
-            font-size:22px;
+            font-size:30px;
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
             font-family: 'Kunstler Script', cursive;
