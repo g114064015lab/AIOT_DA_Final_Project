@@ -519,63 +519,9 @@ def main() -> None:
             """
         )
     else:  # Partners
-        st.subheader("合作與整合（示意圖）")
-        st.markdown("以下為合作模式示意，可替換為實際合作夥伴 Logo。")
-        svg = """
-<svg width="100%" height="280" viewBox="0 0 800 280" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .node { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.25); stroke-width:1.2; }
-    .label { fill: #e8ecff; font-size: 13px; font-family: 'Space Grotesk', 'Segoe UI', sans-serif; }
-    .title { fill: #b8c7ff; font-size: 14px; font-weight: 700; }
-    .arrow { stroke: rgba(255,255,255,0.3); stroke-width:1.5; marker-end: url(#arrowhead); }
-  </style>
-  <defs>
-    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="5" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="rgba(255,255,255,0.45)" />
-    </marker>
-  </defs>
-  <rect x="40" y="60" rx="12" ry="12" width="160" height="120" class="node"/>
-  <rect x="240" y="40" rx="12" ry="12" width="140" height="80" class="node"/>
-  <rect x="240" y="150" rx="12" ry="12" width="140" height="80" class="node"/>
-  <rect x="430" y="60" rx="12" ry="12" width="150" height="120" class="node"/>
-  <rect x="630" y="40" rx="12" ry="12" width="130" height="80" class="node"/>
-  <rect x="630" y="150" rx="12" ry="12" width="130" height="80" class="node"/>
-
-  <text x="60" y="90" class="title">City Ops / 公部門</text>
-  <text x="60" y="115" class="label">- 安全中心</text>
-  <text x="60" y="135" class="label">- 警消調度</text>
-  <text x="60" y="155" class="label">- 合規治理</text>
-
-  <text x="255" y="75" class="title">Edge / IoT</text>
-  <text x="255" y="100" class="label">- 麥克風節點</text>
-  <text x="255" y="120" class="label">- Gateway/5G</text>
-
-  <text x="255" y="185" class="title">SI / OEM</text>
-  <text x="255" y="210" class="label">- 整合部署</text>
-  <text x="255" y="230" class="label">- 維運與 SLA</text>
-
-  <text x="450" y="95" class="title">Cloud / GUARD</text>
-  <text x="450" y="120" class="label">- Stage1/2 模型</text>
-  <text x="450" y="140" class="label">- 事件流/監控</text>
-
-  <text x="645" y="70" class="title">Alert</text>
-  <text x="645" y="95" class="label">- Webhook</text>
-  <text x="645" y="115" class="label">- SMS/Email</text>
-
-  <text x="645" y="180" class="title">Partners</text>
-  <text x="645" y="205" class="label">- CCTV / VMS</text>
-  <text x="645" y="225" class="label">- 交通/地鐵</text>
-
-  <line x1="200" y1="120" x2="240" y2="80" class="arrow" />
-  <line x1="200" y1="120" x2="240" y2="190" class="arrow" />
-  <line x1="380" y1="80" x2="430" y2="100" class="arrow" />
-  <line x1="380" y1="190" x2="430" y2="140" class="arrow" />
-  <line x1="580" y1="120" x2="630" y2="80" class="arrow" />
-  <line x1="580" y1="120" x2="630" y2="190" class="arrow" />
-</svg>
-"""
-        st.markdown(svg, unsafe_allow_html=True)
-        st.caption("可替換為實際夥伴 Logo，SVG 位置/標籤皆可自訂。")
+        st.subheader("合作與整合（流程示意）")
+        st.markdown("下圖示意 GUARD 的端到端管線，可在此區換成合作夥伴 Logo 或自訂圖。")
+        st.image("Arch.png", use_column_width=True, caption="GUARD Pipeline / Partner Integration")
 
 
 if __name__ == "__main__":
