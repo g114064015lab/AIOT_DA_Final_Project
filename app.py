@@ -458,13 +458,32 @@ def main() -> None:
         st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
         uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
         use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=True if uploaded is None else False)
+        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
+        sample_choices = []
+        samples_dir = pathlib.Path("samples")
+        if samples_dir.exists():
+            sample_choices = sorted([p.name for p in samples_dir.glob("sample_*.wav")])
+        chosen_sample = None
+        if sample_choices:
+            chosen_sample = st.selectbox("或選擇一個 sample_* 檔案播放", options=["(不選)"] + sample_choices, index=0)
         audio_bytes: bytes | None = None
         audio_np: np.ndarray | None = None
 
         if uploaded is not None:
             audio_bytes = uploaded.read()
             audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
+        elif chosen_sample and chosen_sample != "(不選)":
+            try:
+                path = samples_dir / chosen_sample
+                audio_np, sr = sf.read(path)
+                if audio_np.ndim > 1:
+                    audio_np = np.mean(audio_np, axis=1)
+                audio_np = audio_np.astype(np.float32)
+                buffer = io.BytesIO()
+                sf.write(buffer, audio_np, sr, format="WAV")
+                audio_bytes = buffer.getvalue()
+            except Exception:
+                audio_np = None
         elif use_loudest:
             best = load_loudest_sample(pathlib.Path("samples"))
             if best is not None:
