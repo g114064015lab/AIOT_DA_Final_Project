@@ -621,8 +621,8 @@ def main() -> None:
   <!-- Arrows beneath nodes -->
   <line x1="210" y1="210" x2="255" y2="120" class="arrow"/>
   <line x1="210" y1="210" x2="255" y2="275" class="arrow"/>
-  <line x1="460" y1="125" x2="515" y2="190" class="arrow"/>
-  <line x1="460" y1="280" x2="515" y2="190" class="arrow"/>
+  <line x1="460" y1="125" x2="515" y2="180" class="arrow"/>
+  <line x1="460" y1="280" x2="515" y2="180" class="arrow"/>
   <line x1="720" y1="205" x2="775" y2="120" class="arrow"/>
   <line x1="720" y1="205" x2="775" y2="275" class="arrow"/>
 
