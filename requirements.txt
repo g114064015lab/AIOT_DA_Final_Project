@@ -5,9 +5,9 @@ soundfile>=0.12
 numpy>=1.26,<2.1
 scipy>=1.11,<1.13
 matplotlib>=3.8,<3.10
+torch>=2.2,<2.4
 
 # Optional (install if you wire real models / services)
-# torch>=2.2
 # redis>=5.0
 # fastapi>=0.110
 # uvicorn[standard]>=0.29

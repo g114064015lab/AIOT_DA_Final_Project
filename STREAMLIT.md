@@ -17,6 +17,10 @@ streamlit run app.py
 ```
 4) 瀏覽器開啟自動跳轉的本地網址（預設 http://localhost:8501）
 
+## 範例音檔
+- 使用腳本產生：`python scripts/generate_sample_audio.py`（輸出至 `samples/`）
+- 或自行錄音後上傳測試。
+
 ## 使用方式
 - 上傳 WAV/OGG/FLAC/MP3，或勾選「使用內建合成範例音訊」。
 - 在側邊欄調整：

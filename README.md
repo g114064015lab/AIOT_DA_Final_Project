@@ -37,6 +37,11 @@
 - Demo 目前內建示意模型（啟發式），請在 `app.py` 中替換為 TorchScript/ONNX CNN 與 Transformer/CRNN，即可接軌真實架構。
 - 詳細說明請見 `STREAMLIT.md`。
 
+## 訓練腳本與樣本
+- Stage-1 CNN scaffold：`src/models/baseline_cnn.py`、`src/train/train_cnn.py`、`src/train/dataset.py`。
+- 產生示例音檔：`python scripts/generate_sample_audio.py`（輸出至 `samples/`），已內建 `demo_gunshot_glass.wav`、`demo_noise.wav` 可直接測試。
+- 特徵/訓練使用說明：`TRAINING.md`。
+
 ### 安裝範例（本地開發）
 ```bash
 python -m venv .venv
