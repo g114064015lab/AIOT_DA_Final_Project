@@ -189,6 +189,27 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
     )
 
 
+def render_event_chips(events: List[DetectionEvent]) -> None:
+    if not events:
+        st.info("尚無事件，請上傳音訊或使用範例。")
+        return
+    top_events = sorted(events, key=lambda e: e.score, reverse=True)[:6]
+    chip_html = []
+    for ev in top_events:
+        chip_html.append(
+            f"""
+            <div class="chip">
+                <div class="chip-label">{ev.label}</div>
+                <div class="chip-meta">Score {ev.score:.3f} · {ev.start:.2f}s → {ev.end:.2f}s · {ev.stage}</div>
+            </div>
+            """
+        )
+    st.markdown(
+        f"""<div class="chip-row">{''.join(chip_html)}</div>""",
+        unsafe_allow_html=True,
+    )
+
+
 # --------- Streamlit UI -------------------------------------------------------
 
 def main() -> None:
@@ -203,12 +224,12 @@ def main() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            background: radial-gradient(120% 120% at 10% 20%, #0f172a 0%, #0b1224 35%, #050915 75%);
+            background: radial-gradient(120% 120% at 10% 20%, #0e1424 0%, #090f1d 35%, #050915 75%);
             color: #e7ecff;
         }
         .hero {
-            background: linear-gradient(135deg, #1d2b64, #1d8bb6);
-            padding: 18px 20px;
+            background: linear-gradient(130deg, rgba(67,111,255,0.88), rgba(32,209,216,0.75));
+            padding: 20px 22px;
             border-radius: 16px;
             color: #f6f8ff;
             box-shadow: 0 20px 50px rgba(0,0,0,0.35);
@@ -217,10 +238,10 @@ def main() -> None:
             display:inline-block;
             padding:6px 12px;
             border-radius:999px;
-            background:#f97316;
-            color:#0b1224;
+            background: rgba(255,255,255,0.85);
+            color:#0c1530;
             font-weight:700;
-            letter-spacing:0.3px;
+            letter-spacing:0.25px;
         }
         .card {
             background: rgba(255,255,255,0.03);
@@ -228,6 +249,38 @@ def main() -> None:
             border-radius: 16px;
             padding: 14px 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        .chip-row {
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin: 8px 0 12px 0;
+        }
+        .chip {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 10px 12px;
+            min-width: 180px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+        }
+        .chip-label {
+            font-weight:700;
+            font-size:14px;
+        }
+        .chip-meta {
+            font-size:12px;
+            opacity:0.8;
+        }
+        .pill {
+            display:inline-block;
+            padding:6px 10px;
+            border-radius:12px;
+            background: rgba(67,111,255,0.18);
+            border:1px solid rgba(67,111,255,0.35);
+            color:#b8cbff;
+            font-size:12px;
+            margin-right:6px;
         }
         </style>
         """,
@@ -264,6 +317,7 @@ def main() -> None:
         allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
 
     st.subheader("1) 載入音訊")
+    st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
     uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
     use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
     audio_bytes: bytes | None = None
@@ -313,6 +367,8 @@ def main() -> None:
     m1.metric("Stage-1 事件數", total_stage1)
     m2.metric("Stage-2 事件數", total_stage2)
     m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
+    st.markdown("**Top Events**")
+    render_event_chips(refined_events or stage1_events)
 
     if allow_download and refined_events:
         csv_buffer = io.StringIO()
