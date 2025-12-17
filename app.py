@@ -196,14 +196,19 @@ def build_waterfall_spectrogram(
     sr: int,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Waveform-only view with unified event overlays and better dynamic range."""
+    """Waveform view with unified overlays and dB color emphasis (red=high, blue=low)."""
     rms = librosa.feature.rms(y=y, frame_length=1024, hop_length=512)[0]
     times = librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=512)
     db = librosa.amplitude_to_db(rms, ref=np.max)
-    min_db = min(-80.0, float(db.min()))
+    min_db = min(-90.0, float(db.min()))
 
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(times, db, color="#9fe2ff", linewidth=1.2)
+    norm_db = (db - min_db) / (0 - min_db + 1e-8)  # normalize to [0,1], higher=hotter
+    # Map to red (max) / blue (min)
+    colors = plt.cm.coolwarm(norm_db)
+    ax.plot(times, db, color="#7da6ff", linewidth=0.8, alpha=0.6)
+    # To emphasize peaks, overlay a thicker line using hot colors
+    ax.scatter(times[::3], db[::3], c=colors[::3], s=6, alpha=0.9, linewidths=0)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Level (dB, rel.)")
     ax.set_ylim(min_db, 3)
