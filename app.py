@@ -459,7 +459,7 @@ def main() -> None:
             font-weight:900;
             font-size:22px;
             letter-spacing:-0.5px;
-            color: rgb(230, 179, 157);
+            color: rgb(128, 99, 88);
             font-family: 'Canela', 'Space Grotesk', 'Segoe UI', sans-serif;
             z-index:2;
         }
