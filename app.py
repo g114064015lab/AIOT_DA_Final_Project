@@ -253,44 +253,51 @@ def build_waterfall_spectrogram(
 
 
 def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
-    """Nightingale / Coxcomb chart showing event duration share by label."""
+    """Nightingale / Coxcomb chart (Altair) showing event duration share by label."""
     if not events:
-        fig, ax = plt.subplots()
-        ax.text(0.5, 0.5, "No events", ha="center", va="center")
-        ax.axis("off")
-        return fig
+        return (
+            alt.Chart(pd.DataFrame({"text": ["No events"]}))
+            .mark_text(size=16, color="#e9edff")
+            .encode(text="text")
+            .properties(width=300, height=200)
+            .configure_view(stroke=None)
+        )
 
     agg: dict[str, float] = {}
     for ev in events:
         agg[ev.label] = agg.get(ev.label, 0.0) + max(ev.end - ev.start, 0.0)
 
-    labels = list(agg.keys())
-    durations = np.array([agg[k] for k in labels], dtype=float)
-    if durations.sum() == 0:
-        durations = np.ones_like(durations)
-    fractions = durations / durations.sum()
+    df = pd.DataFrame(
+        [
+            {"label": k, "duration": v, "pct": v / sum(agg.values()) * 100.0}
+            for k, v in agg.items()
+        ]
+    )
 
-    fig, ax = plt.subplots(figsize=(6, 6), subplot_kw=dict(polar=True))
-    angles = np.linspace(0, 2 * np.pi, len(labels) + 1)
-    colors = plt.cm.tab20(np.linspace(0, 1, len(labels)))
-    for i, (lab, frac, val, col) in enumerate(zip(labels, fractions, durations, colors)):
-        ax.bar(
-            x=angles[i],
-            height=frac * 10,  # scale for visual spread
-            width=2 * np.pi / len(labels),
-            color=col,
-            edgecolor="white",
-            linewidth=1.2,
-            alpha=0.9,
-            label=f"{lab}: {val:.2f}s ({frac*100:.1f}%)",
+    sel = alt.selection_single(fields=["label"], empty="all")
+    base = (
+        alt.Chart(df)
+        .encode(
+            theta=alt.Theta("duration:Q", stack=True),
+            color=alt.Color("label:N", legend=None),
+            tooltip=[
+                alt.Tooltip("label:N", title="Label"),
+                alt.Tooltip("duration:Q", title="Duration (s)", format=".2f"),
+                alt.Tooltip("pct:Q", title="Share (%)", format=".1f"),
+            ],
         )
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(labels)
-    ax.set_yticklabels([])
-    ax.set_title("Event Duration Share (Coxcomb)", va="bottom")
-    ax.legend(loc="center left", bbox_to_anchor=(1.05, 0.5), frameon=False)
-    fig.tight_layout()
-    return fig
+        .add_selection(sel)
+    )
+
+    wedges = base.mark_arc(innerRadius=40, outerRadius=120, stroke="white", strokeWidth=1).encode(
+        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.5))
+    )
+    texts = base.mark_text(radius=140, fontSize=10, color="#e9edff").encode(
+        text="label:N", opacity=alt.condition(sel, alt.value(1.0), alt.value(0.6))
+    )
+    chart = (wedges + texts).properties(width=360, height=360, title="Event Duration Share (Coxcomb)")
+    chart = chart.configure_view(stroke=None).configure_title(color="#e9edff")
+    return chart
 
 
 def load_loudest_sample(samples_dir: pathlib.Path) -> Tuple[np.ndarray, int] | None:
@@ -593,7 +600,10 @@ def main() -> None:
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
             pie_fig = build_event_pie(refined_events)
-            st.pyplot(pie_fig, clear_figure=True, use_container_width=True)
+            if isinstance(pie_fig, alt.Chart):
+                st.altair_chart(pie_fig, use_container_width=True)
+            else:
+                st.pyplot(pie_fig, clear_figure=True, use_container_width=True)
 
         st.markdown("**事件時間軸 (Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
