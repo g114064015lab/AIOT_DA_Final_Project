@@ -613,7 +613,7 @@ def main() -> None:
     <div class="hero">
       <div class="logo-wrap">
         <div class="logo-icon">
-          <span class="logo-letter">G</span>
+          <span class="logo-letter">g</span>
           <div class="logo-bars">
             <span></span><span></span><span></span><span></span>
           </div>
