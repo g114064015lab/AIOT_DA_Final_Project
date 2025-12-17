@@ -386,17 +386,31 @@ def main() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-            background: radial-gradient(120% 120% at 20% 20%, rgba(18,18,26,0.95) 0%, rgba(12,12,20,0.96) 45%, #05070d 80%),
-              linear-gradient(120deg, rgba(222,190,120,0.08) 0%, rgba(40,40,60,0.2) 40%, rgba(222,190,120,0.08) 80%);
+            background:
+              radial-gradient(140% 140% at 15% 25%, rgba(20,20,28,0.95) 0%, rgba(8,8,12,0.96) 45%, #030508 80%),
+              repeating-linear-gradient(110deg, rgba(255,215,150,0.16) 0, rgba(255,215,150,0.16) 2px, transparent 2px, transparent 16px),
+              repeating-linear-gradient(200deg, rgba(255,195,110,0.10) 0, rgba(255,195,110,0.10) 1px, transparent 1px, transparent 22px);
             color: #e7ecff;
         }
         .hero {
-            background: linear-gradient(130deg, rgba(25,25,35,0.95) 0%, rgba(14,10,6,0.92) 40%, rgba(212,170,90,0.16) 100%);
-            padding: 26px 30px;
+            background:
+              linear-gradient(140deg, rgba(32,32,44,0.92) 0%, rgba(18,12,6,0.9) 35%, rgba(240,190,110,0.22) 100%),
+              radial-gradient(180% 140% at 80% 0%, rgba(255,215,150,0.12) 0%, transparent 45%);
+            padding: 28px 32px;
             border-radius: 18px;
             color: #f6f8ff;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,215,170,0.22);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content:"";
+            position:absolute;
+            inset:0;
+            background: repeating-linear-gradient(95deg, rgba(255,220,140,0.12) 0, rgba(255,220,140,0.12) 1px, transparent 1px, transparent 14px);
+            opacity:0.35;
+            pointer-events:none;
         }
         .badge {
             display:inline-block;
