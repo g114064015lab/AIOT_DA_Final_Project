@@ -600,7 +600,7 @@ def main() -> None:
         st.subheader("3) 視覺化與互動")
         if show_spectrogram:
             pie_fig = build_event_pie(refined_events)
-            if isinstance(pie_fig, alt.Chart):
+            if isinstance(pie_fig, (alt.Chart, alt.LayerChart, alt.ConcatChart, alt.HConcatChart, alt.VConcatChart, alt.FacetChart, alt.RepeatChart, alt.TopLevelMixin)):
                 st.altair_chart(pie_fig, use_container_width=True)
             else:
                 st.pyplot(pie_fig, clear_figure=True, use_container_width=True)
