@@ -569,6 +569,39 @@ def main() -> None:
             font-size:12px;
             margin-right:6px;
         }
+        .card-3d {
+            background: linear-gradient(145deg, rgba(30,32,45,0.95), rgba(18,18,26,0.9));
+            border: 1px solid rgba(255,215,170,0.2);
+            border-radius: 18px;
+            box-shadow:
+              0 20px 50px rgba(0,0,0,0.35),
+              inset 0 1px 8px rgba(255,255,255,0.1);
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-3d::before {
+            content:"";
+            position:absolute;
+            inset: -30% 40% auto -30%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,215,150,0.16), transparent 55%);
+            opacity: 0.6;
+            pointer-events:none;
+        }
+        .card-3d h4 {
+            margin: 0 0 6px 0;
+            color: #f6f8ff;
+        }
+        .card-3d p {
+            margin: 4px 0;
+            color: #cfd5ff;
+            font-size: 13px;
+        }
+        .card-3d small {
+            color: #ffdd99;
+            letter-spacing: 0.5px;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -836,13 +869,43 @@ def main() -> None:
             )
     elif nav == "Case Studies":
         st.subheader("案例示意")
-        st.markdown(
-            """
-            - 智慧街區：多點麥克風陣列，Stage-1 高召回，Stage-2 降誤報，誤報率 < 2%。
-            - 校園防護：玻璃破裂與尖叫事件特化模型，事件到警報 < 2 秒。
-            - 交通樞紐：警笛/撞擊辨識，與 CCTV 事件串接，提供事件回放。
-            """
-        )
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.markdown(
+                """
+                <div class="card-3d">
+                  <small>智慧街區 · 3D</small>
+                  <h4>多點麥克風陣列</h4>
+                  <p>Stage-1 高召回，Stage-2 降誤報，誤報率 < 2%。</p>
+                  <p>串接 Redis 緩衝與事件回放，支援地圖熱區。</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with c2:
+            st.markdown(
+                """
+                <div class="card-3d">
+                  <small>校園防護 · 立體聲場</small>
+                  <h4>玻璃破裂 / 尖叫特化</h4>
+                  <p>事件到警報 < 2 秒，夜間靜音自適應。</p>
+                  <p>可搭配 CCTV/門禁，提供 3D 聲源方位回放。</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with c3:
+            st.markdown(
+                """
+                <div class="card-3d">
+                  <small>交通樞紐 · 3D 情境</small>
+                  <h4>警笛 / 撞擊 / 車禍</h4>
+                  <p>與信號優先串接，提供事件縮時與 3D 音景。</p>
+                  <p>低延遲 API，誤報抑制與多源分離。</p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
     elif nav == "Support":
         st.subheader("支援與部署")
         st.markdown(
