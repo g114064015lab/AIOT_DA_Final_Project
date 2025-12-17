@@ -417,29 +417,29 @@ def main() -> None:
         }
         /* Sidebar */
         section[data-testid="stSidebar"] {
-            background: linear-gradient(160deg, rgba(15, 12, 12,0.9), rgba(2212, 175, 55,0.92));
+            background: linear-gradient(160deg, rgba(255,210,230,0.9), rgba(255,190,210,0.92));
             border-right: 1px solid rgba(255,215,170,0.35);
             box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
         }
         section[data-testid="stSidebar"] * {
-            color: #2f1c1c !important;
+            color: #3d2420 !important;
         }
         section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h3 {
-            color: #2f1c1c !important;
-            font-weight: 700;
+            color: #3d2420 !important;
+            font-weight: 800;
         }
         section[data-testid="stSidebar"] input,
         section[data-testid="stSidebar"] textarea {
-            background: #fff4ec !important;
-            color: #2b1a1a !important;
-            border: 1px solid #e7b8a0 !important;
+            background: #fff2e8 !important;
+            color: #2a1610 !important;
+            border: 1px solid #d9a87f !important;
             border-radius: 10px !important;
         }
         section[data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"],
         section[data-testid="stSidebar"] .stMultiSelect div[data-baseweb="select"] {
-            background: #fff4ec !important;
-            color: #2b1a1a !important;
-            border: 1px solid #e7b8a0 !important;
+            background: #fff2e8 !important;
+            color: #2a1610 !important;
+            border: 1px solid #d9a87f !important;
             border-radius: 10px !important;
         }
         section[data-testid="stSidebar"] .stSlider [data-baseweb="track"] {
@@ -452,6 +452,20 @@ def main() -> None:
         }
         section[data-testid="stSidebar"] .stSlider [data-baseweb="tick"] {
             background: #8a5d4a !important;
+        }
+        section[data-testid="stSidebar"] .stNumberInput input {
+            color: #2a1610 !important;
+            background: #fff2e8 !important;
+            border: 1px solid #d9a87f !important;
+            border-radius: 10px !important;
+        }
+        section[data-testid="stSidebar"] .stNumberInput button {
+            background: #1f1616 !important;
+            color: #f1c9ad !important;
+            border: 1px solid #d9a87f !important;
+        }
+        section[data-testid="stSidebar"] .stNumberInput svg {
+            fill: #f1c9ad !important;
         }
         .hero {
             background:
