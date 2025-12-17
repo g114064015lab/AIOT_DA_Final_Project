@@ -253,46 +253,58 @@ def build_waterfall_spectrogram(
 
 
 def build_event_pie(events: List[DetectionEvent]) -> plt.Figure:
-    """3D-ish pie (matplotlib) showing event duration share by label."""
+    """Interactive Coxcomb (Altair) showing event duration share; hover to highlight."""
     if not events:
-        fig, ax = plt.subplots(figsize=(4, 4))
-        ax.text(0.5, 0.5, "No events", ha="center", va="center")
-        ax.axis("off")
-        return fig
+        return (
+            alt.Chart(pd.DataFrame({"text": ["No events"]}))
+            .mark_text(size=16, color="#e9edff")
+            .encode(text="text")
+            .properties(width=320, height=220)
+            .configure_view(stroke=None)
+        )
 
     agg: dict[str, float] = {}
     for ev in events:
         agg[ev.label] = agg.get(ev.label, 0.0) + max(ev.end - ev.start, 0.0)
 
-    labels = list(agg.keys())
-    durations = np.array([agg[k] for k in labels], dtype=float)
-    total = durations.sum()
-    if total <= 0:
-        durations = np.ones_like(durations)
-        total = durations.sum()
-
-    explode = [0.1 if d == durations.max() else 0.03 for d in durations]
-    colors = ["#6aa9ff", "#5dd4c6", "#ffb86c", "#ff6b6b", "#b084ff", "#ffd166"]
-
-    fig, ax = plt.subplots(figsize=(6, 4.8), subplot_kw=dict(aspect="equal"))
-    wedges, texts, autotexts = ax.pie(
-        durations,
-        explode=explode,
-        labels=labels,
-        autopct=lambda pct: f"{pct:.0f}%" if pct >= 5 else "",
-        startangle=120,
-        colors=colors[: len(durations)],
-        shadow=True,
-        pctdistance=0.7,
-        labeldistance=1.05,
-        wedgeprops={"edgecolor": "#1b2430", "linewidth": 1.0},
+    df = pd.DataFrame(
+        [
+            {"label": k, "duration": v, "pct": v / sum(agg.values()) * 100.0}
+            for k, v in agg.items()
+        ]
     )
-    plt.setp(texts, size=9, color="#0b0f1a")
-    plt.setp(autotexts, size=9, color="#0b0f1a")
-    ax.set_title("Event Duration Share (Stage-2)", fontsize=14, color="#e9edff")
-    fig.patch.set_facecolor("#0b0f1a")
-    ax.set_facecolor("#0b0f1a")
-    return fig
+
+    sel = alt.selection_single(fields=["label"], empty="all", on="mouseover")
+    base = (
+        alt.Chart(df)
+        .encode(
+            theta=alt.Theta("duration:Q", stack=True),
+            color=alt.Color("label:N", legend=None, scale=alt.Scale(scheme="tableau20")),
+            tooltip=[
+                alt.Tooltip("label:N", title="Label"),
+                alt.Tooltip("duration:Q", title="Duration (s)", format=".2f"),
+                alt.Tooltip("pct:Q", title="Share (%)", format=".1f"),
+            ],
+        )
+        .add_selection(sel)
+    )
+
+    wedges = base.mark_arc(innerRadius=60, stroke="white", strokeWidth=1.0).encode(
+        outerRadius=alt.condition(sel, alt.value(180), alt.value(140)),
+        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.65)),
+    )
+    texts = base.mark_text(fontSize=9, color="#e9edff").encode(
+        radius=alt.value(195),
+        text="label:N",
+        opacity=alt.condition(sel, alt.value(1.0), alt.value(0.45)),
+    )
+    chart = (wedges + texts).properties(width=440, height=440, title="Event Duration Share (Stage-2)")
+    chart = (
+        chart.configure_view(stroke=None)
+        .configure_title(color="#e9edff", fontSize=16)
+        .configure_axis(labelColor="#e9edff", titleColor="#e9edff")
+    )
+    return chart
 
 
 def load_loudest_sample(samples_dir: pathlib.Path) -> Tuple[np.ndarray, int] | None:
