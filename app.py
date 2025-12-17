@@ -621,37 +621,37 @@ def main() -> None:
   <!-- Source -->
   <rect x="40" y="150" width="170" height="120" class="card"/>
   <rect x="60" y="165" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="60" y="205" class="title">PyAudio</text>
+  <text x="60" y="205" class="title">🎙 PyAudio</text>
   <text x="60" y="230" class="desc">ffmpeg capture</text>
 
   <!-- Librosa -->
   <rect x="260" y="70" width="200" height="100" class="card"/>
   <rect x="280" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="280" y="125" class="title">Librosa</text>
+  <text x="280" y="125" class="title">🎵 Librosa</text>
   <text x="280" y="150" class="desc">Feature extract / slice</text>
 
   <!-- Stage1 CNN -->
   <rect x="260" y="220" width="200" height="100" class="card"/>
   <rect x="280" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="280" y="275" class="title">Stage-1 CNN</text>
+  <text x="280" y="275" class="title">🔥 Stage-1 CNN</text>
   <text x="280" y="300" class="desc">Segment edge detect</text>
 
   <!-- Redis -->
   <rect x="520" y="145" width="200" height="120" class="card"/>
   <rect x="540" y="160" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="540" y="200" class="title">Redis Buffer</text>
+  <text x="540" y="200" class="title">🧠 Redis Buffer</text>
   <text x="540" y="225" class="desc">Feature/logits cache</text>
 
   <!-- Transformer -->
   <rect x="780" y="70" width="200" height="100" class="card"/>
   <rect x="800" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="800" y="125" class="title">Transformer</text>
+  <text x="800" y="125" class="title">🌀 Transformer</text>
   <text x="800" y="150" class="desc">Sequence refine</text>
 
   <!-- Inference -->
   <rect x="780" y="220" width="200" height="100" class="card"/>
   <rect x="800" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="800" y="275" class="title">Inference Service</text>
+  <text x="800" y="275" class="title">🚀 Inference Service</text>
   <text x="800" y="300" class="desc">Alerts / API</text>
 
   <!-- Arrows -->
