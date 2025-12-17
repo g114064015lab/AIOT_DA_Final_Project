@@ -592,56 +592,78 @@ def main() -> None:
             """
         )
         svg_arch = """
-<svg width="100%" height="320" viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    .node { fill: rgba(255,255,255,0.08); stroke: rgba(255,255,255,0.25); stroke-width:1.4; }
-    .label { fill: #e8ecff; font-size: 15px; font-family: 'Space Grotesk','Segoe UI',sans-serif; font-weight:700; }
-    .sub { fill: #cdd5ff; font-size: 13px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
-    .arrow { stroke: rgba(255,255,255,0.6); stroke-width:2; marker-end: url(#ah); }
-  </style>
+<svg width="100%" height="360" viewBox="0 0 1080 360" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <marker id="ah" markerWidth="10" markerHeight="8" refX="5" refY="4" orient="auto">
-      <polygon points="0 0, 10 4, 0 8" fill="rgba(255,255,255,0.7)" />
+    <linearGradient id="gradA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e4cff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#24c4ff" stop-opacity="0.9"/>
+    </linearGradient>
+    <linearGradient id="gradB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f26666" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#f8b46b" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="rgba(0,0,0,0.35)"/>
+    </filter>
+    <marker id="ah" markerWidth="12" markerHeight="10" refX="6" refY="5" orient="auto">
+      <polygon points="0 0, 12 5, 0 10" fill="rgba(255,255,255,0.8)" />
     </marker>
   </defs>
+  <style>
+    .node { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.22); stroke-width:1.5; filter:url(#shadow);}
+    .label { fill: #e8ecff; font-size: 16px; font-family: 'Space Grotesk','Segoe UI',sans-serif; font-weight:700; }
+    .sub { fill: #cfd8ff; font-size: 13px; font-family: 'Space Grotesk','Segoe UI',sans-serif; }
+    .arrow { stroke: rgba(255,255,255,0.65); stroke-width:2.4; marker-end: url(#ah); }
+    .pillA { fill: url(#gradA); }
+    .pillB { fill: url(#gradB); }
+  </style>
+
   <!-- Nodes -->
-  <rect x="40" y="110" rx="14" ry="14" width="140" height="100" class="node"/>
-  <rect x="220" y="60" rx="14" ry="14" width="170" height="90" class="node"/>
-  <rect x="220" y="190" rx="14" ry="14" width="170" height="90" class="node"/>
-  <rect x="430" y="110" rx="14" ry="14" width="170" height="100" class="node"/>
-  <rect x="640" y="60" rx="14" ry="14" width="170" height="90" class="node"/>
-  <rect x="640" y="190" rx="14" ry="14" width="170" height="90" class="node"/>
+  <rect x="60"  y="125" rx="16" ry="16" width="170" height="110" class="node"/>
+  <rect x="280" y="60"  rx="16" ry="16" width="190" height="90"  class="node"/>
+  <rect x="280" y="200" rx="16" ry="16" width="190" height="90"  class="node"/>
+  <rect x="520" y="125" rx="16" ry="16" width="170" height="110" class="node"/>
+  <rect x="740" y="60"  rx="16" ry="16" width="190" height="90"  class="node"/>
+  <rect x="740" y="200" rx="16" ry="16" width="190" height="90"  class="node"/>
+
+  <!-- Pills -->
+  <rect x="75"  y="140" rx="10" ry="10" width="40" height="18" class="pillA"/>
+  <rect x="295" y="75"  rx="10" ry="10" width="40" height="18" class="pillA"/>
+  <rect x="295" y="215" rx="10" ry="10" width="40" height="18" class="pillB"/>
+  <rect x="535" y="140" rx="10" ry="10" width="40" height="18" class="pillB"/>
+  <rect x="755" y="75"  rx="10" ry="10" width="40" height="18" class="pillA"/>
+  <rect x="755" y="215" rx="10" ry="10" width="40" height="18" class="pillB"/>
 
   <!-- Text -->
-  <text x="60" y="150" class="label">PyAudio</text>
-  <text x="60" y="175" class="sub">via ffmpeg</text>
+  <text x="120" y="180" class="label">PyAudio</text>
+  <text x="120" y="205" class="sub">ffmpeg stream</text>
 
-  <text x="240" y="95" class="label">Librosa</text>
-  <text x="240" y="120" class="sub">Feature Extract / Slice</text>
+  <text x="330" y="105" class="label">Librosa</text>
+  <text x="330" y="130" class="sub">Feature extract / slice</text>
 
-  <text x="240" y="225" class="label">PyTorch CNN</text>
-  <text x="240" y="250" class="sub">Segment-level edge</text>
+  <text x="330" y="245" class="label">Stage-1 CNN</text>
+  <text x="330" y="270" class="sub">Segment edge detect</text>
 
-  <text x="450" y="145" class="label">Redis Buffer</text>
-  <text x="450" y="170" class="sub">Feature/logits cache</text>
+  <text x="570" y="180" class="label">Redis Buffer</text>
+  <text x="570" y="205" class="sub">Feature / logits cache</text>
 
-  <text x="660" y="95" class="label">Transformer</text>
-  <text x="660" y="120" class="sub">Sequence refine</text>
+  <text x="790" y="105" class="label">Transformer</text>
+  <text x="790" y="130" class="sub">Sequence refine</text>
 
-  <text x="660" y="225" class="label">Deployment</text>
-  <text x="660" y="250" class="sub">Inference Service</text>
+  <text x="790" y="245" class="label">Inference Service</text>
+  <text x="790" y="270" class="sub">Alerts / API</text>
 
   <!-- Arrows -->
-  <line x1="180" y1="160" x2="220" y2="115" class="arrow"/>
-  <line x1="180" y1="160" x2="220" y2="225" class="arrow"/>
-  <line x1="390" y1="115" x2="430" y2="150" class="arrow"/>
-  <line x1="390" y1="225" x2="430" y2="170" class="arrow"/>
-  <line x1="600" y1="150" x2="640" y2="110" class="arrow"/>
-  <line x1="600" y1="150" x2="640" y2="235" class="arrow"/>
+  <line x1="230" y1="180" x2="280" y2="105" class="arrow"/>
+  <line x1="230" y1="180" x2="280" y2="245" class="arrow"/>
+  <line x1="470" y1="105" x2="520" y2="180" class="arrow"/>
+  <line x1="470" y1="245" x2="520" y2="180" class="arrow"/>
+  <line x1="690" y1="180" x2="740" y2="105" class="arrow"/>
+  <line x1="690" y1="180" x2="740" y2="245" class="arrow"/>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
-        st.caption("GUARD Pipeline — 可依實際部署替換節點/文字")
+        st.caption("GUARD Pipeline — 以向量風格重現 Arch 流程，可替換文字節點與連接")
 
 
 if __name__ == "__main__":
