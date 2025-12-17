@@ -446,29 +446,29 @@ def main() -> None:
         allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
 
     if nav == "Products":
-    st.subheader("1) 載入音訊")
-    st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
-    uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
-    use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-    use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
-    audio_bytes: bytes | None = None
-    audio_np: np.ndarray | None = None
+        st.subheader("1) 載入音訊")
+        st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
+        uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
+        use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
+        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
+        audio_bytes: bytes | None = None
+        audio_np: np.ndarray | None = None
 
-    if uploaded is not None:
-        audio_bytes = uploaded.read()
-        audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
-    elif use_loudest:
-        best = load_loudest_sample(pathlib.Path("samples"))
-        if best is not None:
-            audio_np, sr = best
+        if uploaded is not None:
+            audio_bytes = uploaded.read()
+            audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
+        elif use_loudest:
+            best = load_loudest_sample(pathlib.Path("samples"))
+            if best is not None:
+                audio_np, sr = best
+                buffer = io.BytesIO()
+                sf.write(buffer, audio_np, sr, format="WAV")
+                audio_bytes = buffer.getvalue()
+        elif use_demo:
+            audio_np, sr = generate_demo_audio(sample_rate=sr)
             buffer = io.BytesIO()
             sf.write(buffer, audio_np, sr, format="WAV")
             audio_bytes = buffer.getvalue()
-    elif use_demo:
-        audio_np, sr = generate_demo_audio(sample_rate=sr)
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_np, sr, format="WAV")
-        audio_bytes = buffer.getvalue()
 
         if audio_bytes:
             st.audio(audio_bytes, format="audio/wav")
@@ -507,7 +507,6 @@ def main() -> None:
         m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
         st.markdown("**Top Events (可調整顯示數量)**")
         top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
-        
 
         if allow_download and refined_events:
             csv_buffer = io.StringIO()
