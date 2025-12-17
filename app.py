@@ -251,6 +251,34 @@ def main() -> None:
             padding: 14px 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.25);
         }
+        /* Nav bar styling */
+        div[data-testid="stRadio"] > div {
+            flex-direction: row;
+            gap: 16px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        div[data-testid="stRadio"] label {
+            background: transparent;
+            color: #e8ecff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            transition: all 160ms ease;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        div[data-testid="stRadio"] label:hover {
+            color: #b8c7ff;
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            transform: translateY(-1px);
+        }
+        div[data-testid="stRadio"] label[data-checked="true"] {
+            color: #a5baff;
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(75,109,255,0.12);
+        }
         .chip-row {
             display:flex;
             flex-wrap:wrap;
@@ -304,6 +332,12 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
+    tabs = ["Products", "Applications", "Case Studies", "Support", "Partners"]
+    nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
+
+    if nav != "Products":
+        st.sidebar.info("切回 Products 頁即可使用上傳、推論與可視化。")
+
     with st.sidebar:
         st.header("⚙️ 推論設定")
         sr = st.number_input("Sample rate", value=16000, step=1000, min_value=8000, max_value=48000)
@@ -322,122 +356,161 @@ def main() -> None:
         show_spectrogram = st.checkbox("顯示頻譜圖", value=True)
         allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
 
-    st.subheader("1) 載入音訊")
-    st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
-    uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
-    use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-    audio_bytes: bytes | None = None
-    audio_np: np.ndarray | None = None
+    if nav == "Products":
+        st.subheader("1) 載入音訊")
+        st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
+        uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
+        use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
+        audio_bytes: bytes | None = None
+        audio_np: np.ndarray | None = None
 
-    if uploaded is not None:
-        audio_bytes = uploaded.read()
-        audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
-    elif use_demo:
-        audio_np, sr = generate_demo_audio(sample_rate=sr)
-        buffer = io.BytesIO()
-        sf.write(buffer, audio_np, sr, format="WAV")
-        audio_bytes = buffer.getvalue()
+        if uploaded is not None:
+            audio_bytes = uploaded.read()
+            audio_np, sr = load_audio(io.BytesIO(audio_bytes), sample_rate=sr)
+        elif use_demo:
+            audio_np, sr = generate_demo_audio(sample_rate=sr)
+            buffer = io.BytesIO()
+            sf.write(buffer, audio_np, sr, format="WAV")
+            audio_bytes = buffer.getvalue()
 
-    if audio_bytes:
-        st.audio(audio_bytes, format="audio/wav")
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/wav")
 
-    if audio_np is None:
-        st.info("請上傳音訊或啟用合成範例。")
-        return
+        if audio_np is None:
+            st.info("請上傳音訊或啟用合成範例。")
+            return
 
-    st.subheader("2) 特徵與兩階段推論")
-    frame_length = int(frame_len_sec * sr)
-    hop_length = int(hop_len_sec * sr)
+        st.subheader("2) 特徵與兩階段推論")
+        frame_length = int(frame_len_sec * sr)
+        hop_length = int(hop_len_sec * sr)
 
-    stage1 = Stage1CNNEdgeDetector(sample_rate=sr, threshold=stage1_threshold)
-    stage2 = Stage2SequenceRefiner(class_map=class_map or ["other"], min_duration=min_duration, bonus=stage2_bonus)
+        stage1 = Stage1CNNEdgeDetector(sample_rate=sr, threshold=stage1_threshold)
+        stage2 = Stage2SequenceRefiner(class_map=class_map or ["other"], min_duration=min_duration, bonus=stage2_bonus)
 
-    with st.spinner("運行偵測中…"):
-        stage1_events = stage1.predict(audio_np, frame_length=frame_length, hop_length=hop_length)
-        refined_events = stage2.refine(stage1_events)
+        with st.spinner("運行偵測中…"):
+            stage1_events = stage1.predict(audio_np, frame_length=frame_length, hop_length=hop_length)
+            refined_events = stage2.refine(stage1_events)
 
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.markdown("**階段 1：CNN 邊緣偵測 (示意)**")
-        st.dataframe(format_events(stage1_events), use_container_width=True, hide_index=True)
-    with col2:
-        st.markdown("**階段 2：Transformer/CRNN 時序精煉 (示意)**")
-        st.dataframe(format_events(refined_events), use_container_width=True, hide_index=True)
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            st.markdown("**階段 1：CNN 邊緣偵測 (示意)**")
+            st.dataframe(format_events(stage1_events), use_container_width=True, hide_index=True)
+        with col2:
+            st.markdown("**階段 2：Transformer/CRNN 時序精煉 (示意)**")
+            st.dataframe(format_events(refined_events), use_container_width=True, hide_index=True)
 
-    # Metrics summary cards
-    total_stage1 = len(stage1_events)
-    total_stage2 = len(refined_events)
-    max_score = max([ev.score for ev in refined_events], default=0.0)
-    unique_labels = len({ev.label for ev in refined_events}) if refined_events else 0
-    m1, m2, m3 = st.columns(3)
-    m1.metric("Stage-1 事件數", total_stage1)
-    m2.metric("Stage-2 事件數", total_stage2)
-    m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
-    st.markdown("**Top Events (可調整顯示數量)**")
-    top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
-    render_event_chips(refined_events or stage1_events, top_k=top_k)
+        # Metrics summary cards
+        total_stage1 = len(stage1_events)
+        total_stage2 = len(refined_events)
+        max_score = max([ev.score for ev in refined_events], default=0.0)
+        unique_labels = len({ev.label for ev in refined_events}) if refined_events else 0
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Stage-1 事件數", total_stage1)
+        m2.metric("Stage-2 事件數", total_stage2)
+        m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
+        st.markdown("**Top Events (可調整顯示數量)**")
+        top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
+        render_event_chips(refined_events or stage1_events, top_k=top_k)
 
-    if allow_download and refined_events:
-        csv_buffer = io.StringIO()
-        csv_buffer.write("id,start,end,label,score,stage\n")
-        for ev in refined_events:
-            csv_buffer.write(
-                f"{uuid.uuid4().hex},{ev.start:.3f},{ev.end:.3f},{ev.label},{ev.score:.3f},{ev.stage}\n"
-            )
-        st.download_button(
-            "下載偵測結果 CSV",
-            data=csv_buffer.getvalue().encode("utf-8"),
-            file_name="sed_events.csv",
-            mime="text/csv",
-        )
-
-    st.subheader("3) 視覺化與互動")
-    if show_spectrogram:
-        fig = plot_spectrogram(audio_np, sr)
-        st.pyplot(fig, clear_figure=True, use_container_width=True)
-
-    st.markdown("**事件時間軸 (Stage1 / Stage2)**")
-    df_events = events_to_df(stage1_events + refined_events)
-    if not df_events.empty:
-        stages = df_events["stage"].unique().tolist()
-        labels = df_events["label"].unique().tolist()
-        stage_filter = st.multiselect("篩選階段", options=stages, default=stages)
-        label_filter = st.multiselect("篩選類別", options=labels, default=labels)
-        filtered = df_events[
-            df_events["stage"].isin(stage_filter) & df_events["label"].isin(label_filter)
-        ]
-        if not filtered.empty:
-            chart = (
-                alt.Chart(filtered)
-                .mark_bar(cornerRadius=6)
-                .encode(
-                    x=alt.X("start:Q", title="Start (s)"),
-                    x2="end:Q",
-                    y=alt.Y("label:N", title="Label"),
-                    color=alt.Color("stage:N", scale=alt.Scale(scheme="tableau20")),
-                    tooltip=[
-                        alt.Tooltip("label:N", title="Label"),
-                        alt.Tooltip("stage:N", title="Stage"),
-                        alt.Tooltip("start:Q", title="Start (s)", format=".2f"),
-                        alt.Tooltip("end:Q", title="End (s)", format=".2f"),
-                        alt.Tooltip("score:Q", title="Score", format=".3f"),
-                    ],
+        if allow_download and refined_events:
+            csv_buffer = io.StringIO()
+            csv_buffer.write("id,start,end,label,score,stage\n")
+            for ev in refined_events:
+                csv_buffer.write(
+                    f"{uuid.uuid4().hex},{ev.start:.3f},{ev.end:.3f},{ev.label},{ev.score:.3f},{ev.stage}\n"
                 )
-                .properties(height=260)
+            st.download_button(
+                "下載偵測結果 CSV",
+                data=csv_buffer.getvalue().encode("utf-8"),
+                file_name="sed_events.csv",
+                mime="text/csv",
             )
-            st.altair_chart(chart, use_container_width=True)
-        else:
-            st.info("無符合篩選條件的事件。")
 
-    st.subheader("4) 如何換成真實模型？")
-    st.markdown(
+        st.subheader("3) 視覺化與互動")
+        if show_spectrogram:
+            fig = plot_spectrogram(audio_np, sr)
+            st.pyplot(fig, clear_figure=True, use_container_width=True)
+
+        st.markdown("**事件時間軸 (Stage1 / Stage2)**")
+        df_events = events_to_df(stage1_events + refined_events)
+        if not df_events.empty:
+            stages = df_events["stage"].unique().tolist()
+            labels = df_events["label"].unique().tolist()
+            stage_filter = st.multiselect("篩選階段", options=stages, default=stages)
+            label_filter = st.multiselect("篩選類別", options=labels, default=labels)
+            filtered = df_events[
+                df_events["stage"].isin(stage_filter) & df_events["label"].isin(label_filter)
+            ]
+            if not filtered.empty:
+                chart = (
+                    alt.Chart(filtered)
+                    .mark_bar(cornerRadius=6)
+                    .encode(
+                        x=alt.X("start:Q", title="Start (s)"),
+                        x2="end:Q",
+                        y=alt.Y("label:N", title="Label"),
+                        color=alt.Color("stage:N", scale=alt.Scale(scheme="tableau20")),
+                        tooltip=[
+                            alt.Tooltip("label:N", title="Label"),
+                            alt.Tooltip("stage:N", title="Stage"),
+                            alt.Tooltip("start:Q", title="Start (s)", format=".2f"),
+                            alt.Tooltip("end:Q", title="End (s)", format=".2f"),
+                            alt.Tooltip("score:Q", title="Score", format=".3f"),
+                        ],
+                    )
+                    .properties(height=260)
+                )
+                st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("無符合篩選條件的事件。")
+
+        st.subheader("4) 如何換成真實模型？")
+        st.markdown(
+            """
+        - 以 TorchScript 或 ONNX 載入你的 Stage-1 CNN，將 `Stage1CNNEdgeDetector.predict` 改為模型推論。
+        - 將 Stage-2 換成已訓練的 Transformer/CRNN，輸入序列特徵或 logits，輸出事件列表。
+        - 若需 Redis 緩衝，從 Stage-1 產生的 logits/特徵推入緩衝，再由 Stage-2 批次讀取。
+        - 將告警管道（Webhook/SMS/Email）接在 Stage-2 結果上，依據閾值與冷卻時間推送。
         """
-- 以 TorchScript 或 ONNX 載入你的 Stage-1 CNN，將 `Stage1CNNEdgeDetector.predict` 改為模型推論。
-- 將 Stage-2 換成已訓練的 Transformer/CRNN，輸入序列特徵或 logits，輸出事件列表。
-- 若需 Redis 緩衝，從 Stage-1 產生的 logits/特徵推入緩衝，再由 Stage-2 批次讀取。
-- 將告警管道（Webhook/SMS/Email）接在 Stage-2 結果上，依據閾值與冷卻時間推送。
-"""
-    )
+        )
+    elif nav == "Applications":
+        st.subheader("城市安全與應用場景")
+        st.markdown(
+            """
+            - 槍響/爆炸：即時警報、通知調度中心與附近單位。
+            - 玻璃破裂/侵入：夜間防護與場館監控。
+            - 警笛/車禍警示：交通枢紐與十字路口安全。
+            - 人群尖叫/求救：公眾聚集區、地鐵與商場。
+            """
+        )
+    elif nav == "Case Studies":
+        st.subheader("案例示意")
+        st.markdown(
+            """
+            - 智慧街區：多點麥克風陣列，Stage-1 高召回，Stage-2 降誤報，誤報率 < 2%。
+            - 校園防護：玻璃破裂與尖叫事件特化模型，事件到警報 < 2 秒。
+            - 交通樞紐：警笛/撞擊辨識，與 CCTV 事件串接，提供事件回放。
+            """
+        )
+    elif nav == "Support":
+        st.subheader("支援與部署")
+        st.markdown(
+            """
+            - 部署：`pip install -r requirements.txt` → `streamlit run app.py`（建議 Python 3.11）。
+            - 模型：使用 `requirements-train.txt` 於本地訓練，導出 TorchScript/ONNX 後替換 app。
+            - 系統需求：ffmpeg、可選 PyAudio/Redis；HTTPS/TLS 建議。
+            - 疑難排除：缺少 torch 請切 3.10–3.12；ffmpeg 不在 PATH 請安裝並重開終端。
+            """
+        )
+    else:  # Partners
+        st.subheader("合作與整合")
+        st.markdown(
+            """
+            - 與監控平台整合：提供事件 Webhook/REST；可掛上權限與簽名。
+            - OEM / SI：可提供模型導出與邊緣部署最佳化（量化/剪枝）。
+            - 聯絡：請透過專案維護者或內部渠道洽談技術合作。
+            """
+        )
 
 
 if __name__ == "__main__":
