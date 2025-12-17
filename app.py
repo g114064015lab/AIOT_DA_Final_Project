@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 import streamlit as st
+import pydeck as pdk
 
 
 # --------- Data structures ----------------------------------------------------
@@ -187,6 +188,21 @@ def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
             for ev in events
         ]
     )
+
+
+def sample_geo_events() -> pd.DataFrame:
+    # Mocked city coordinates (Taipei area) with class/score to visualize on a 3D map.
+    data = [
+        {"lat": 25.0330, "lon": 121.5654, "class": "gunshot", "score": 0.82},
+        {"lat": 25.0478, "lon": 121.5319, "class": "glass_break", "score": 0.65},
+        {"lat": 25.0418, "lon": 121.5080, "class": "siren", "score": 0.72},
+        {"lat": 25.0520, "lon": 121.5430, "class": "scream", "score": 0.55},
+        {"lat": 25.0260, "lon": 121.5270, "class": "gunshot", "score": 0.91},
+        {"lat": 25.0600, "lon": 121.5200, "class": "glass_break", "score": 0.60},
+        {"lat": 25.0300, "lon": 121.5500, "class": "siren", "score": 0.70},
+        {"lat": 25.0570, "lon": 121.5650, "class": "scream", "score": 0.58},
+    ]
+    return pd.DataFrame(data)
 
 
 def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
@@ -474,21 +490,66 @@ def main() -> None:
         """
         )
     elif nav == "Applications":
-        st.subheader("城市安全與應用場景")
+        st.subheader("城市安全與應用場景 · 3D Map 互動")
         st.markdown(
             """
-            - 槍響/爆炸：即時警報、通知調度中心與附近單位。
-            - 玻璃破裂/侵入：夜間防護與場館監控。
-            - 警笛/車禍警示：交通枢紐與十字路口安全。
-            - 人群尖叫/求救：公眾聚集區、地鐵與商場。
+            在地圖上查看事件類型與強度，理解 GUARD 如何在城市中布署。
+            - 事件越亮/柱狀越高代表置信度越高。
+            - 可篩選類別、調整柱高比例與半徑。
+            - 換成真實佈點：以實際 lat/lon 與 class/score 替換 `sample_geo_events()`.
             """
         )
+        geo_df = sample_geo_events()
+        classes = sorted(geo_df["class"].unique().tolist())
+        col_ctrl1, col_ctrl2, col_ctrl3 = st.columns(3)
+        with col_ctrl1:
+            sel_classes = st.multiselect("顯示類別", classes, default=classes)
+        with col_ctrl2:
+            radius = st.slider("半徑 (公尺)", 80, 300, 160, 10)
+        with col_ctrl3:
+            height_scale = st.slider("高度比例", 50, 300, 120, 10)
+
+        filtered = geo_df[geo_df["class"].isin(sel_classes)].copy()
+        # Map color by class
+        color_map = {
+            "gunshot": [255, 90, 90],
+            "glass_break": [255, 180, 80],
+            "siren": [90, 180, 255],
+            "scream": [160, 120, 255],
+        }
+        filtered["color"] = filtered["class"].map(color_map).fillna([200, 200, 200])
+        filtered["elevation"] = (filtered["score"] * height_scale).astype(float)
+
+        midpoint = [filtered["lat"].mean(), filtered["lon"].mean()] if not filtered.empty else [25.04, 121.56]
+        layer = pdk.Layer(
+            "ColumnLayer",
+            data=filtered,
+            get_position=["lon", "lat"],
+            get_elevation="elevation",
+            elevation_scale=1,
+            radius=radius,
+            get_fill_color="color",
+            pickable=True,
+            auto_highlight=True,
+        )
+        view_state = pdk.ViewState(
+            longitude=midpoint[1],
+            latitude=midpoint[0],
+            zoom=12.5,
+            min_zoom=5,
+            max_zoom=18,
+            pitch=45,
+            bearing=15,
+        )
+        tooltip = {"text": "Class: {class}\nScore: {score}\nLat: {lat}\nLon: {lon}"}
+        st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state, tooltip=tooltip, map_style="mapbox://styles/mapbox/dark-v11"))
+
         st.divider()
         c1, c2 = st.columns(2)
         with c1:
             st.markdown("**交通與城市運維**")
             st.write(
-                "- 十字路口警笛辨識，提醒信號優先切換\n"
+                "- 十字路口警笛辨識，信號優先切換\n"
                 "- 公車/地鐵站月台，尖叫/求救觸發安保\n"
                 "- 工地/施工區域，異常爆裂聲即時通報"
             )
