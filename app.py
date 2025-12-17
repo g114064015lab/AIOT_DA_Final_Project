@@ -17,9 +17,11 @@ import uuid
 from dataclasses import dataclass
 from typing import Iterable, List, Tuple
 
+import altair as alt
 import librosa
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import soundfile as sf
 import streamlit as st
 
@@ -171,6 +173,22 @@ def format_events(events: List[DetectionEvent]) -> List[dict]:
     ]
 
 
+def events_to_df(events: List[DetectionEvent]) -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "start": ev.start,
+                "end": ev.end,
+                "label": ev.label,
+                "score": ev.score,
+                "stage": ev.stage,
+                "duration": max(ev.end - ev.start, 0.0001),
+            }
+            for ev in events
+        ]
+    )
+
+
 # --------- Streamlit UI -------------------------------------------------------
 
 def main() -> None:
@@ -179,11 +197,53 @@ def main() -> None:
         page_icon="🎧",
         layout="wide",
     )
-    st.title("GUARD：城市聲音事件偵測與公共安全警報 — 互動 Demo")
-    st.markdown("**Slogan：GUARD: The City Never Sleeps, Neither Do We.**")
-    st.caption("General Urban Audio Recognition & Defense — 守護與防禦，強調系統安全性與可靠性。")
-    st.caption("Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. "
-               "Upload或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。")
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap');
+        html, body, [class*="css"]  {
+            font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+            background: radial-gradient(120% 120% at 10% 20%, #0f172a 0%, #0b1224 35%, #050915 75%);
+            color: #e7ecff;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1d2b64, #1d8bb6);
+            padding: 18px 20px;
+            border-radius: 16px;
+            color: #f6f8ff;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+        .badge {
+            display:inline-block;
+            padding:6px 12px;
+            border-radius:999px;
+            background:#f97316;
+            color:#0b1224;
+            font-weight:700;
+            letter-spacing:0.3px;
+        }
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 14px 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        """
+        <div class="hero">
+          <div class="badge">GUARD · General Urban Audio Recognition & Defense</div>
+          <h2 style="margin:10px 0 6px 0;">城市聲音事件偵測與公共安全警報 — 互動 Demo</h2>
+          <p style="margin:0;font-size:16px;">Slogan：GUARD: The City Never Sleeps, Neither Do We.</p>
+          <p style="margin:4px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     with st.sidebar:
         st.header("⚙️ 推論設定")
@@ -244,6 +304,16 @@ def main() -> None:
         st.markdown("**階段 2：Transformer/CRNN 時序精煉 (示意)**")
         st.dataframe(format_events(refined_events), use_container_width=True, hide_index=True)
 
+    # Metrics summary cards
+    total_stage1 = len(stage1_events)
+    total_stage2 = len(refined_events)
+    max_score = max([ev.score for ev in refined_events], default=0.0)
+    unique_labels = len({ev.label for ev in refined_events}) if refined_events else 0
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Stage-1 事件數", total_stage1)
+    m2.metric("Stage-2 事件數", total_stage2)
+    m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
+
     if allow_download and refined_events:
         csv_buffer = io.StringIO()
         csv_buffer.write("id,start,end,label,score,stage\n")
@@ -258,10 +328,43 @@ def main() -> None:
             mime="text/csv",
         )
 
-    st.subheader("3) 音訊視覺化")
+    st.subheader("3) 視覺化與互動")
     if show_spectrogram:
         fig = plot_spectrogram(audio_np, sr)
         st.pyplot(fig, clear_figure=True, use_container_width=True)
+
+    st.markdown("**事件時間軸 (Stage1 / Stage2)**")
+    df_events = events_to_df(stage1_events + refined_events)
+    if not df_events.empty:
+        stages = df_events["stage"].unique().tolist()
+        labels = df_events["label"].unique().tolist()
+        stage_filter = st.multiselect("篩選階段", options=stages, default=stages)
+        label_filter = st.multiselect("篩選類別", options=labels, default=labels)
+        filtered = df_events[
+            df_events["stage"].isin(stage_filter) & df_events["label"].isin(label_filter)
+        ]
+        if not filtered.empty:
+            chart = (
+                alt.Chart(filtered)
+                .mark_bar(cornerRadius=6)
+                .encode(
+                    x=alt.X("start:Q", title="Start (s)"),
+                    x2="end:Q",
+                    y=alt.Y("label:N", title="Label"),
+                    color=alt.Color("stage:N", scale=alt.Scale(scheme="tableau20")),
+                    tooltip=[
+                        alt.Tooltip("label:N", title="Label"),
+                        alt.Tooltip("stage:N", title="Stage"),
+                        alt.Tooltip("start:Q", title="Start (s)", format=".2f"),
+                        alt.Tooltip("end:Q", title="End (s)", format=".2f"),
+                        alt.Tooltip("score:Q", title="Score", format=".3f"),
+                    ],
+                )
+                .properties(height=260)
+            )
+            st.altair_chart(chart, use_container_width=True)
+        else:
+            st.info("無符合篩選條件的事件。")
 
     st.subheader("4) 如何換成真實模型？")
     st.markdown(
