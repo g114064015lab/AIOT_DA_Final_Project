@@ -175,15 +175,15 @@ def format_events(events: List[DetectionEvent]) -> List[dict]:
 
 def main() -> None:
     st.set_page_config(
-        page_title="Urban Acoustic SED & Alert Demo",
+        page_title="GUARD | Urban Acoustic SED & Alert Demo",
         page_icon="🎧",
         layout="wide",
     )
-    st.title("城市聲音事件偵測與公共安全警報 — 互動 Demo")
-    st.caption(
-        "Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. "
-        "Upload或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。"
-    )
+    st.title("GUARD：城市聲音事件偵測與公共安全警報 — 互動 Demo")
+    st.markdown("**Slogan：GUARD: The City Never Sleeps, Neither Do We.**")
+    st.caption("General Urban Audio Recognition & Defense — 守護與防禦，強調系統安全性與可靠性。")
+    st.caption("Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. "
+               "Upload或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。")
 
     with st.sidebar:
         st.header("⚙️ 推論設定")
