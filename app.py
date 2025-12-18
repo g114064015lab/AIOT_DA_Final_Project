@@ -197,7 +197,7 @@ def build_waterfall_spectrogram(
     sr: int,
     overlay_events: List[DetectionEvent] | None = None,
 ) -> plt.Figure:
-    """Waterfall-style log-mel spectrogram (red=高能量, 藍=低能量) with optional event overlays."""
+    """Waterfall-style log-mel spectrogram (red=高能?? ??低能?? with optional event overlays."""
     hop_length = 512
     n_mels = 64
     mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
@@ -205,7 +205,7 @@ def build_waterfall_spectrogram(
     times = librosa.frames_to_time(np.arange(S_dB.shape[1]), sr=sr, hop_length=hop_length)
     vmax = float(np.percentile(S_dB, 99))
     vmin = float(np.percentile(S_dB, 5))
-    # 保持約 60 dB 動態範圍，避免全藍
+    # 保??60 dB ??範?，避?全??
     min_db = max(vmin, vmax - 60.0)
     max_db = vmax
 
@@ -374,7 +374,7 @@ def sample_geo_events() -> pd.DataFrame:
 
 def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
     if not events:
-        st.info("尚無事件，請上傳音訊或使用範例。")
+        st.info("尚無事件，?上傳???使??例?)
         return
     top_events = sorted(events, key=lambda e: e.score, reverse=True)[:top_k]
     chip_html = []
@@ -383,7 +383,7 @@ def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
             f"""
             <div class="chip">
                 <div class="chip-label">{ev.label}</div>
-                <div class="chip-meta">Score {ev.score:.3f} · {ev.start:.2f}s → {ev.end:.2f}s · {ev.stage}</div>
+                <div class="chip-meta">Score {ev.score:.3f} · {ev.start:.2f}s ??{ev.end:.2f}s · {ev.stage}</div>
             </div>
             """
         )
@@ -398,7 +398,7 @@ def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
 def main() -> None:
     st.set_page_config(
         page_title="GUARD | Urban Acoustic SED & Alert Demo",
-        page_icon="🎧",
+        page_icon="?",
         layout="wide",
     )
     st.markdown(
@@ -473,6 +473,32 @@ def main() -> None:
         }
         section[data-testid="stSidebar"] .stNumberInput svg {
             fill: #f1c9ad !important;
+        }
+        .sidebar-logo {
+            margin-top: 18px;
+            padding: 14px 12px 10px 12px;
+            background: linear-gradient(135deg, rgba(255,210,66,0.28), rgba(222,213,200,0.42));
+            border: 1px solid rgba(181,141,84,0.4);
+            border-radius: 18px;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.25), 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .sidebar-logo .logo-icon {
+            transform: scale(0.85);
+            margin: 0 auto 4px auto;
+        }
+        .logo-text-mini {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            color: #3d2420;
+            margin-bottom: 2px;
+        }
+        .logo-sub-mini {
+            font-size: 11px;
+            letter-spacing: 0.4px;
+            color: #5a382b;
+            opacity: 0.85;
         }
         .hero {
             background:
@@ -746,9 +772,9 @@ def main() -> None:
         </div>
         <div class="logo-text">GUARD · General Urban Audio Recognition & Defense</div>
       </div>
-      <h2 style="margin:12px 0 6px 0;font-size:32px;font-weight:800;">城市聲音事件偵測與公共安全警報</h2>
+      <h2 style="margin:12px 0 6px 0;font-size:32px;font-weight:800;">???音事件?測?公???警??/h2>
       <p style="margin:0;font-size:16px;font-weight:600;">GUARD: The City Never Sleeps, Neither Do We.</p>
-      <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN → Transformer/CRNN) with Librosa preprocessing. Upload 或使用合成範例音訊，調整閾值與時序設定，查看偵測結果。</p>
+      <p style="margin:6px 0 0 0;font-size:14px;opacity:0.9;">Two-Stage SED (CNN ??Transformer/CRNN) with Librosa preprocessing. Upload ?使????例音訊?調整?值???設?，查?偵測???/p>
     </div>
     """,
         unsafe_allow_html=True,
@@ -758,10 +784,10 @@ def main() -> None:
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
 
     if nav != "Products":
-        st.sidebar.info("切回 Products 頁即可使用上傳、推論與可視化。")
+        st.sidebar.info("?? Products ?即?使???、推論?????)
 
     with st.sidebar:
-        st.header("⚙️ 推論設定")
+        st.header("?? ??設?")
         sr = st.number_input("Sample rate", value=16000, step=1000, min_value=8000, max_value=48000)
         frame_len_sec = st.slider("Frame length (seconds)", 0.5, 2.5, 1.0, 0.25)
         hop_len_sec = st.slider("Hop length (seconds)", 0.1, 1.0, 0.25, 0.05)
@@ -769,28 +795,41 @@ def main() -> None:
         stage2_bonus = st.slider("Stage-2 score bonus", 0.0, 0.5, 0.1, 0.01)
         min_duration = st.slider("Stage-2 min duration (s)", 0.1, 2.0, 0.4, 0.1)
         class_map = st.multiselect(
-            "事件類別映射 (示意)",
+            "事件類別?? (示?)",
             options=["gunshot", "glass_break", "car_horn", "scream", "other"],
             default=["gunshot", "glass_break", "scream"],
         )
         st.divider()
-        st.markdown("**互動元素**")
-        show_spectrogram = st.checkbox("顯示頻譜圖", value=True)
-        allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
+        st.markdown("**互???**")
+        show_spectrogram = st.checkbox("顯示????, value=True)
+        allow_download = st.checkbox("?許下??測結? CSV", value=True)
+        st.markdown(
+            """
+            <div class=\"sidebar-logo\">
+              <div class=\"logo-icon\">
+                <span class=\"logo-letter\">G</span>
+                <div class=\"logo-bars\"><span></span><span></span><span></span><span></span></div>
+              </div>
+              <div class=\"logo-text-mini\">GUARD · SED</div>
+              <div class=\"logo-sub-mini\">The City Never Sleeps</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     if nav == "Products":
-        st.subheader("1) 載入音訊")
+        st.subheader("1) 載入??")
         st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
         uploaded = st.file_uploader("上傳 WAV/OGG/FLAC/MP3", type=["wav", "ogg", "flac", "mp3"])
-        use_demo = st.checkbox("使用內建合成範例音訊（含槍響+玻璃破裂）", value=uploaded is None)
-        use_loudest = st.checkbox("改用 samples/ 中最響的樣本（50 個 sample_*）", value=False)
+        use_demo = st.checkbox("使用?建??範???（含槍響+?????, value=uploaded is None)
+        use_loudest = st.checkbox("?用 samples/ 中?????0 ??sample_*?, value=False)
         sample_choices = []
         samples_dir = pathlib.Path("samples")
         if samples_dir.exists():
             sample_choices = sorted([p.name for p in samples_dir.glob("sample_*.wav")])
         chosen_sample = None
         if sample_choices:
-            chosen_sample = st.selectbox("或選擇一個 sample_* 檔案播放", options=["(不選)"] + sample_choices, index=0)
+            chosen_sample = st.selectbox("?選????sample_* 檔??放", options=["(不選)"] + sample_choices, index=0)
         audio_bytes: bytes | None = None
         audio_np: np.ndarray | None = None
 
@@ -826,26 +865,26 @@ def main() -> None:
             st.audio(audio_bytes, format="audio/wav")
 
         if audio_np is None:
-            st.info("請上傳音訊或啟用合成範例。")
+            st.info("請??音訊??用??範???)
             return
 
-        st.subheader("2) 特徵與兩階段推論")
+        st.subheader("2) ?徵?兩?段??")
         frame_length = int(frame_len_sec * sr)
         hop_length = int(hop_len_sec * sr)
 
         stage1 = Stage1CNNEdgeDetector(sample_rate=sr, threshold=stage1_threshold)
         stage2 = Stage2SequenceRefiner(class_map=class_map or ["other"], min_duration=min_duration, bonus=stage2_bonus)
 
-        with st.spinner("運行偵測中…"):
+        with st.spinner("???測中?):
             stage1_events = stage1.predict(audio_np, frame_length=frame_length, hop_length=hop_length)
             refined_events = stage2.refine(stage1_events)
 
         col1, col2 = st.columns([2, 1])
         with col1:
-            st.markdown("**階段 1：CNN 邊緣偵測 (示意)**")
+            st.markdown("**?段 1：CNN ?緣?測 (示?)**")
             st.dataframe(format_events(stage1_events), use_container_width=True, hide_index=True)
         with col2:
-            st.markdown("**階段 2：Transformer/CRNN 時序精煉 (示意)**")
+            st.markdown("**?段 2：Transformer/CRNN ??精? (示?)**")
             st.dataframe(format_events(refined_events), use_container_width=True, hide_index=True)
 
         # Metrics summary cards
@@ -854,11 +893,11 @@ def main() -> None:
         max_score = max([ev.score for ev in refined_events], default=0.0)
         unique_labels = len({ev.label for ev in refined_events}) if refined_events else 0
         m1, m2, m3 = st.columns(3)
-        m1.metric("Stage-1 事件數", total_stage1)
-        m2.metric("Stage-2 事件數", total_stage2)
-        m3.metric("最高置信度", f"{max_score:.3f}", help="經 Stage-2 平滑後的最大 score")
-        st.markdown("**Top Events (可調整顯示數量)**")
-        top_k = st.slider("顯示前 N 筆", 3, 12, 6, 1)
+        m1.metric("Stage-1 事件??, total_stage1)
+        m2.metric("Stage-2 事件??, total_stage2)
+        m3.metric("?高置信度", f"{max_score:.3f}", help="?Stage-2 平?後???score")
+        st.markdown("**Top Events (?調?顯示數??**")
+        top_k = st.slider("顯示??N ?, 3, 12, 6, 1)
 
         if allow_download and refined_events:
             csv_buffer = io.StringIO()
@@ -868,13 +907,13 @@ def main() -> None:
                     f"{uuid.uuid4().hex},{ev.start:.3f},{ev.end:.3f},{ev.label},{ev.score:.3f},{ev.stage}\n"
                 )
             st.download_button(
-                "下載偵測結果 CSV",
+                "下??測結? CSV",
                 data=csv_buffer.getvalue().encode("utf-8"),
                 file_name="sed_events.csv",
                 mime="text/csv",
             )
 
-        st.subheader("3) 視覺化與互動")
+        st.subheader("3) 視覺??互?")
         if show_spectrogram:
             pie_fig = build_event_pie(refined_events)
             if isinstance(pie_fig, (alt.Chart, alt.LayerChart, alt.ConcatChart, alt.HConcatChart, alt.VConcatChart, alt.FacetChart, alt.RepeatChart, alt.TopLevelMixin)):
@@ -882,12 +921,12 @@ def main() -> None:
             else:
                 st.pyplot(pie_fig, clear_figure=True, use_container_width=True)
 
-        st.markdown("**事件時間軸 (Stage1 / Stage2)**")
+        st.markdown("**事件???(Stage1 / Stage2)**")
         df_events = events_to_df(stage1_events + refined_events)
         if not df_events.empty:
             stages = df_events["stage"].unique().tolist()
             labels = df_events["label"].unique().tolist()
-            stage_filter = st.multiselect("篩選階段", options=stages, default=stages)
+            stage_filter = st.multiselect("篩選?段", options=stages, default=stages)
             label_filter = st.multiselect("篩選類別", options=labels, default=labels)
             filtered = df_events[
                 df_events["stage"].isin(stage_filter) & df_events["label"].isin(label_filter)
@@ -913,25 +952,25 @@ def main() -> None:
                 )
                 st.altair_chart(chart, use_container_width=True)
             else:
-                st.info("無符合篩選條件的事件。")
+                st.info("?符?篩??件?事件??)
 
-        st.subheader("4) 如何換成真實模型？")
+        st.subheader("4) 如????實模??)
         st.markdown(
             """
-        - 以 TorchScript 或 ONNX 載入你的 Stage-1 CNN，將 `Stage1CNNEdgeDetector.predict` 改為模型推論。
-        - 將 Stage-2 換成已訓練的 Transformer/CRNN，輸入序列特徵或 logits，輸出事件列表。
-        - 若需 Redis 緩衝，從 Stage-1 產生的 logits/特徵推入緩衝，再由 Stage-2 批次讀取。
-        - 將告警管道（Webhook/SMS/Email）接在 Stage-2 結果上，依據閾值與冷卻時間推送。
+        - ?TorchScript ??ONNX 載入你? Stage-1 CNN，? `Stage1CNNEdgeDetector.predict` ?為模?????
+        - ?Stage-2 ??已?練? Transformer/CRNN，輸???特徵? logits，輸??件?表?
+        - ?? Redis 緩?，? Stage-1 ????logits/?徵?入緩?，???Stage-2 ?次讀??
+        - 將?警管??Webhook/SMS/Email）接??Stage-2 結?上?依??值??卻???送?
         """
         )
     elif nav == "Applications":
-        st.subheader("城市安全與應用場景 · 3D Map 互動")
+        st.subheader("??安全???場??· 3D Map 互?")
         st.markdown(
             """
-            在地圖上查看事件類型與強度，理解 GUARD 如何在城市中布署。
-            - 事件越亮/柱狀越高代表置信度越高。
-            - 可篩選類別、調整柱高比例與半徑。
-            - 換成真實佈點：以實際 lat/lon 與 class/score 替換 `sample_geo_events()`.
+            ?地????事件類??強度??解 GUARD 如???市中布署??
+            - 事件越亮/??越??置信度?高?
+            - ?篩???、調?柱高?例?????
+            - ???實佈?：以實? lat/lon ??class/score ?? `sample_geo_events()`.
             """
         )
         geo_df = sample_geo_events()
@@ -940,9 +979,9 @@ def main() -> None:
         with col_ctrl1:
             sel_classes = st.multiselect("顯示類別", classes, default=classes)
         with col_ctrl2:
-            radius = st.slider("半徑 (公尺)", 80, 300, 160, 10)
+            radius = st.slider("?? (?尺)", 80, 300, 160, 10)
         with col_ctrl3:
-            height_scale = st.slider("高度比例", 50, 300, 120, 10)
+            height_scale = st.slider("高度比?", 50, 300, 120, 10)
 
         filtered = geo_df[geo_df["class"].isin(sel_classes)].copy()
         # Map color by class
@@ -981,7 +1020,7 @@ def main() -> None:
         with map_col:
             st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state, tooltip=tooltip, map_style="mapbox://styles/mapbox/dark-v11"))
         with legend_col:
-            st.markdown("**圖例**")
+            st.markdown("**??**")
             for lbl, col in color_map.items():
                 st.markdown(
                     f"<div style='display:flex;align-items:center;gap:8px;margin-bottom:4px;'>"
@@ -994,30 +1033,30 @@ def main() -> None:
         st.divider()
         c1, c2 = st.columns(2)
         with c1:
-            st.markdown("**交通與城市運維**")
+            st.markdown("**交通????維**")
             st.write(
-                "- 十字路口警笛辨識，信號優先切換\n"
-                "- 公車/地鐵站月台，尖叫/求救觸發安保\n"
-                "- 工地/施工區域，異常爆裂聲即時通報"
+                "- ??路口警?辨?，信?優???\n"
+                "- ??/?鐵站???尖叫/求?觸發安?\n"
+                "- 工地/?工????常???即?通報"
             )
         with c2:
-            st.markdown("**場域防護與民生**")
+            st.markdown("**???護????*")
             st.write(
-                "- 校園/醫院/商場的玻璃破裂與闖入偵測\n"
-                "- 社區夜間巡防：異常撞擊聲、爭吵尖叫\n"
-                "- 智慧建築：機房異音、設備異常噪音預警"
+                "- ??/?院/?場?玻?破裂??入?測\n"
+                "- 社?夜?巡防：異常??聲?爭???\n"
+                "- ?慧建?：??異?、設?異常噪???
             )
     elif nav == "Case Studies":
-        st.subheader("案例示意")
+        st.subheader("案?示?")
         c1, c2, c3 = st.columns(3)
         with c1:
             st.markdown(
                 """
                 <div class="card-3d">
-                  <small>智慧街區 · 3D</small>
-                  <h4>多點麥克風陣列</h4>
-                  <p>Stage-1 高召回，Stage-2 降誤報，誤報率 < 2%。</p>
-                  <p>串接 Redis 緩衝與事件回放，支援地圖熱區。</p>
+                  <small>?慧街? · 3D</small>
+                  <h4>多?麥?風陣??/h4>
+                  <p>Stage-1 高召??Stage-2 ?誤??誤報??< 2%??/p>
+                  <p>串接 Redis 緩???件????援??????/p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -1026,10 +1065,10 @@ def main() -> None:
             st.markdown(
                 """
                 <div class="card-3d">
-                  <small>校園防護 · 立體聲場</small>
-                  <h4>玻璃破裂 / 尖叫特化</h4>
-                  <p>事件到警報 < 2 秒，夜間靜音自適應。</p>
-                  <p>可搭配 CCTV/門禁，提供 3D 聲源方位回放。</p>
+                  <small>???護 · 立??場</small>
+                  <h4>???? / 尖叫??</h4>
+                  <p>事件?警??< 2 秒?夜??音?適??/p>
+                  <p>?搭??CCTV/?禁??? 3D ?????放??/p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -1038,24 +1077,24 @@ def main() -> None:
             st.markdown(
                 """
                 <div class="card-3d">
-                  <small>交通樞紐 · 3D 情境</small>
-                  <h4>警笛 / 撞擊 / 車禍</h4>
-                  <p>與信號優先串接，提供事件縮時與 3D 音景。</p>
-                  <p>低延遲 API，誤報抑制與多源分離。</p>
+                  <small>交通??· 3D ??</small>
+                  <h4>警? / ?? / 車?</h4>
+                  <p>?信?優?串????事件縮???3D ?景??/p>
+                  <p>低延??API，誤????多??離??/p>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
     elif nav == "Support":
-        st.subheader("支援與部署")
+        st.subheader("?援?部?)
         st.markdown(
             """
             <div class="manual-card">
               <div class="manual-step">
                 <div class="manual-step-number">1</div>
                 <div class="manual-step-text">
-                  <h4>環境準備</h4>
-                  <p>安裝 Python 3.11，`pip install -r requirements.txt`，確保 ffmpeg 在 PATH。</p>
+                  <h4>??準?</h4>
+                  <p>安? Python 3.11，`pip install -r requirements.txt`，確?ffmpeg ??PATH??/p>
                 </div>
               </div>
             </div>
@@ -1063,8 +1102,8 @@ def main() -> None:
               <div class="manual-step">
                 <div class="manual-step-number">2</div>
                 <div class="manual-step-text">
-                  <h4>啟動服務</h4>
-                  <p>在專案根目錄執行：`streamlit run app.py`。雲端部署請啟用 headless。</p>
+                  <h4>????</h4>
+                  <p>??案根????：`streamlit run app.py`?雲端部署??用 headless??/p>
                 </div>
               </div>
             </div>
@@ -1072,8 +1111,8 @@ def main() -> None:
               <div class="manual-step">
                 <div class="manual-step-number">3</div>
                 <div class="manual-step-text">
-                  <h4>載入與推論</h4>
-                  <p>上傳音訊或選用 samples，調整 frame/hop、閾值，檢視事件與下載 CSV。</p>
+                  <h4>載入?推?/h4>
+                  <p>上傳???選??samples，調??frame/hop?閾??檢?事件???CSV??/p>
                 </div>
               </div>
             </div>
@@ -1081,8 +1120,8 @@ def main() -> None:
               <div class="manual-step">
                 <div class="manual-step-number">4</div>
                 <div class="manual-step-text">
-                  <h4>替換模型</h4>
-                  <p>用 `requirements-train.txt` 訓練 Stage-1/2，導出 TorchScript/ONNX，替換 `Stage1CNNEdgeDetector` / `Stage2SequenceRefiner`。</p>
+                  <h4>??模?</h4>
+                  <p>??`requirements-train.txt` 訓練 Stage-1/2，???TorchScript/ONNX，替??`Stage1CNNEdgeDetector` / `Stage2SequenceRefiner`??/p>
                 </div>
               </div>
             </div>
@@ -1090,8 +1129,8 @@ def main() -> None:
               <div class="manual-step">
                 <div class="manual-step-number">5</div>
                 <div class="manual-step-text">
-                  <h4>部署與安全</h4>
-                  <p>反向代理 + TLS；Webhook 權限/簽名；Redis 設存取控制與監控。</p>
+                  <h4>?署????/h4>
+                  <p>???? + TLS；Webhook 權?/簽?；Redis 設??控??????/p>
                 </div>
               </div>
             </div>
@@ -1099,8 +1138,8 @@ def main() -> None:
               <div class="manual-step">
                 <div class="manual-step-number">6</div>
                 <div class="manual-step-text">
-                  <h4>疑難排除</h4>
-                  <p>torch 安裝失敗：改用 Python 3.10–3.12。ffmpeg 缺失：安裝後重開終端。</p>
+                  <h4>?難?除</h4>
+                  <p>torch 安?失?：改??Python 3.10??.12?ffmpeg 缺失：?裝???終端??/p>
                 </div>
               </div>
             </div>
@@ -1108,15 +1147,15 @@ def main() -> None:
             unsafe_allow_html=True,
         )
     else:  # Architecture
-        st.subheader("Architecture · GUARD 端到端流程")
+        st.subheader("Architecture · GUARD 端到端??)
         st.markdown(
             """
-            - PyAudio/ffmpeg：接收城市音訊。
-            - Librosa：特徵抽取、切片（Log-Mel/PCEN）。
-            - Stage-1 CNN：片段級高召回偵測。
-            - Redis：特徵/logits 緩衝供序列模型取用。
-            - Transformer/序列模型：時序精煉降誤報。
-            - Deployment/Inference Service：輸出事件、警報與 API。
+            - PyAudio/ffmpeg：接??市音訊?
+            - Librosa：特徵抽?、???Log-Mel/PCEN）?
+            - Stage-1 CNN：?段?高召?偵測?
+            - Redis：特?logits 緩?供??模????
+            - Transformer/序?模?：?序精??誤報??
+            - Deployment/Inference Service：輸??件、警?? API??
             """
         )
         svg_arch = """
@@ -1159,44 +1198,45 @@ def main() -> None:
   <!-- Source -->
   <rect x="40" y="150" width="170" height="120" class="card"/>
   <rect x="60" y="165" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="60" y="205" class="title">🎙 PyAudio</text>
+  <text x="60" y="205" class="title">?? PyAudio</text>
   <text x="60" y="230" class="desc">ffmpeg capture</text>
 
   <!-- Librosa -->
   <rect x="260" y="60" width="200" height="100" class="card"/>
   <rect x="280" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="280" y="125" class="title">🎵 Librosa</text>
+  <text x="280" y="125" class="title">? Librosa</text>
   <text x="280" y="150" class="desc">Feature extract / slice</text>
 
   <!-- Stage1 CNN -->
   <rect x="260" y="220" width="200" height="100" class="card"/>
   <rect x="280" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="280" y="275" class="title">🔥 Stage-1 CNN</text>
+  <text x="280" y="275" class="title">? Stage-1 CNN</text>
   <text x="280" y="300" class="desc">Segment edge detect</text>
 
   <!-- Redis -->
   <rect x="520" y="135" width="200" height="120" class="card"/>
   <rect x="540" y="160" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="540" y="200" class="title">🧠 Redis Buffer</text>
+  <text x="540" y="200" class="title">?? Redis Buffer</text>
   <text x="540" y="225" class="desc">Feature/logits cache</text>
 
   <!-- Transformer -->
   <rect x="780" y="60" width="200" height="100" class="card"/>
   <rect x="800" y="85" width="46" height="20" rx="10" class="badgeBlue"/>
-  <text x="800" y="125" class="title">🌀 Transformer</text>
+  <text x="800" y="125" class="title">?? Transformer</text>
   <text x="800" y="150" class="desc">Sequence refine</text>
 
   <!-- Inference -->
   <rect x="780" y="220" width="200" height="100" class="card"/>
   <rect x="800" y="235" width="46" height="20" rx="10" class="badgeOrange"/>
-  <text x="800" y="275" class="title">🚀 Inference Service</text>
+  <text x="800" y="275" class="title">?? Inference Service</text>
   <text x="800" y="300" class="desc">Alerts / API</text>
   </g>
 </svg>
 """
         st.markdown(svg_arch, unsafe_allow_html=True)
-        st.caption("GUARD Pipeline — 逐節點顯示來源、前處理、兩階段模型、緩衝與服務")
+        st.caption("GUARD Pipeline ????點顯示?源、????兩?段模??緩衝???")
 
 
 if __name__ == "__main__":
     main()
+
