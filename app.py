@@ -423,7 +423,7 @@ def main() -> None:
                 rgba(212,175,55,0.94) 45%,
                 rgba(212,175,55,0.88) 70%,
                 rgba(140,105,35,0.88) 88%,
-                rgba(20,15,15,0.94) 100%
+                rgba(222,213,200,0.94) 100%
             );
             border-right: 1px solid rgba(255,215,170,0.35);
             box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
