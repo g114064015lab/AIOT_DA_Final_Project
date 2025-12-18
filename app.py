@@ -780,16 +780,15 @@ def main() -> None:
 
         st.divider()
         
-    st.markdown(
-        """
-    
-        <div class="logo-icon">
-          <span class="logo-letter">G</span>
-          </div>
+        st.markdown(
+            """
+            <div class="logo-icon">
+              <span class="logo-letter">G</span>
+            </div>
         
-    """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
 
         
         
