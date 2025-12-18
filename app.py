@@ -516,7 +516,7 @@ def main() -> None:
             overflow: hidden;
         }
         .logo-letter {
-            font-weight:900;
+            font-weight:700;
             font-size:40px;
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
