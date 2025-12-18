@@ -521,7 +521,7 @@ def main() -> None:
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
             font-family: 'Kunstler Script', cursive;
-            margin-right: 6px;
+            margin-right: 15px;
             z-index:1;
         }
         .logo-letter-sidebar {
