@@ -419,9 +419,9 @@ def main() -> None:
         section[data-testid="stSidebar"] {
             background: linear-gradient(
                 170deg,
-                rgba(212,175,55,0.97) 0%,
-                rgba(212,175,55,0.94) 45%,
-                rgba(212,175,55,0.88) 70%,
+                rgba(255,210,66,0.97) 0%,
+                rgba(255,210,66,0.94) 45%,
+                rgba(255,210,66,0.88) 70%,
                 rgba(140,105,35,0.88) 88%,
                 rgba(222,213,200,0.94) 100%
             );
