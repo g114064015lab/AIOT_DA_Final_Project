@@ -935,15 +935,7 @@ def main() -> None:
             else:
                 st.info("無符合篩選條件的事件。")
 
-        st.subheader("4) 如何換成真實模型？")
-        st.markdown(
-            """
-        - 以 TorchScript 或 ONNX 載入你的 Stage-1 CNN，將 `Stage1CNNEdgeDetector.predict` 改為模型推論。
-        - 將 Stage-2 換成已訓練的 Transformer/CRNN，輸入序列特徵或 logits，輸出事件列表。
-        - 若需 Redis 緩衝，從 Stage-1 產生的 logits/特徵推入緩衝，再由 Stage-2 批次讀取。
-        - 將告警管道（Webhook/SMS/Email）接在 Stage-2 結果上，依據閾值與冷卻時間推送。
-        """
-        )
+        
     elif nav == "Applications":
         st.subheader("城市安全與應用場景 · 3D Map 互動")
         st.markdown(
