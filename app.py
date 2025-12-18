@@ -775,10 +775,24 @@ def main() -> None:
             default=["gunshot", "glass_break", "scream"],
         )
         st.divider()
-        st.markdown("**互動元素**")
-        show_spectrogram = st.checkbox("顯示頻譜圖", value=True)
+        show_spectrogram = st.checkbox("顯示圓餅圖", value=True)
         allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
 
+        st.divider()
+        
+    st.markdown(
+        """
+    
+        <div class="logo-icon">
+          <span class="logo-letter">G</span>
+          </div>
+        
+    """,
+        unsafe_allow_html=True,
+    )
+
+        
+        
     if nav == "Products":
         st.subheader("1) 載入音訊")
         st.markdown('<span class="pill">Upload</span><span class="pill">Demo</span><span class="pill">Adjust Thresholds</span>', unsafe_allow_html=True)
