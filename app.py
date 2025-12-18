@@ -419,11 +419,11 @@ def main() -> None:
         section[data-testid="stSidebar"] {
             background: linear-gradient(
                 170deg,
-                rgba(212,175,55,0.95) 0%,
-                rgba(212,175,55,0.9) 35%,
-                rgba(212,175,55,0.82) 60%,
-                rgba(88,65,22,0.88) 78%,
-                rgba(15,12,12,0.94) 100%
+                rgba(212,175,55,0.97) 0%,
+                rgba(212,175,55,0.94) 45%,
+                rgba(212,175,55,0.88) 70%,
+                rgba(140,105,35,0.88) 88%,
+                rgba(20,15,15,0.94) 100%
             );
             border-right: 1px solid rgba(255,215,170,0.35);
             box-shadow: inset -6px 0 12px rgba(0,0,0,0.15);
