@@ -374,7 +374,7 @@ def sample_geo_events() -> pd.DataFrame:
 
 def render_event_chips(events: List[DetectionEvent], top_k: int = 6) -> None:
     if not events:
-        st.info("尚無事件，?上傳???使??例?)
+        st.info("尚無事件，請上傳或使用示例音訊")
         return
     top_events = sorted(events, key=lambda e: e.score, reverse=True)[:top_k]
     chip_html = []
@@ -865,7 +865,7 @@ def main() -> None:
             st.audio(audio_bytes, format="audio/wav")
 
         if audio_np is None:
-            st.info("請??音訊??用??範???)
+            st.info("請上傳音訊或使用範例檔")
             return
 
         st.subheader("2) ?徵?兩?段??")
@@ -952,7 +952,7 @@ def main() -> None:
                 )
                 st.altair_chart(chart, use_container_width=True)
             else:
-                st.info("?符?篩??件?事件??)
+                st.info("未符合篩選條件的事件")
 
         st.subheader("4) 如????實模??)
         st.markdown(
@@ -1239,4 +1239,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
