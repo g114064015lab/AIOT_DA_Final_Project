@@ -408,11 +408,11 @@ def main() -> None:
         html, body, [class*="css"]  {
             font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
             background:
-              radial-gradient(140% 140% at 15% 25%, rgba(26,20,12,0.96) 0%, rgba(8,6,4,0.97) 45%, #020305 80%),
-              repeating-linear-gradient(110deg, rgba(255,215,150,0.28) 0, rgba(255,215,150,0.28) 2px, transparent 2px, transparent 12px),
-              repeating-linear-gradient(200deg, rgba(255,195,110,0.22) 0, rgba(255,195,110,0.22) 1px, transparent 1px, transparent 18px),
-              radial-gradient(90% 60% at 78% 12%, rgba(255,215,170,0.26), transparent 60%),
-              radial-gradient(70% 40% at 20% 80%, rgba(255,200,140,0.18), transparent 55%);
+              linear-gradient(125deg, rgba(43,45,48,1) 0%, rgba(43,45,48,0.96) 55%, rgba(43,45,48,0.92) 100%),
+              radial-gradient(120% 120% at 20% 20%, rgba(255,215,150,0.18), transparent 60%),
+              radial-gradient(140% 90% at 80% 10%, rgba(255,210,120,0.12), transparent 55%),
+              repeating-linear-gradient(110deg, rgba(255,215,150,0.10) 0, rgba(255,215,150,0.10) 2px, transparent 2px, transparent 12px),
+              repeating-linear-gradient(200deg, rgba(255,195,110,0.08) 0, rgba(255,195,110,0.08) 1px, transparent 1px, transparent 18px);
             color: #e7ecff;
         }
         /* Sidebar */
