@@ -512,13 +512,13 @@ def main() -> None:
             align-items:center;
             justify-content:center;
             color:#0b0f1a;
-            position: relative;
+            position: left;
             overflow: hidden;
         }
         .logo-letter {
             font-weight:900;
             font-size:30px;
-            letter-spacing:10px;
+            letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
             font-family: 'Kunstler Script', cursive;
             z-index:2;
