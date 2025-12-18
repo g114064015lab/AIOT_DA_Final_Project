@@ -774,7 +774,13 @@ def main() -> None:
             default=["gunshot", "glass_break", "scream"],
         )
         st.divider()
-        <span class="logo-letter">G</span>
+        st.markdown("""
+        <div class="logo-icon">
+            <span class="logo-letter">G</span>
+        </div>"""
+        ,
+        unsafe_allow_html=True,
+    )
 
     if nav == "Products":
         st.subheader("1) 載入音訊")
