@@ -523,6 +523,14 @@ def main() -> None:
             font-family: 'Kunstler Script', cursive;
             z-index:2;
         }
+        .logo-letter-sidebar {
+            font-weight:900;
+            font-size:50px;
+            letter-spacing:-0.5px;
+            color: rgb(128, 99, 88);
+            font-family: 'Kunstler Script', cursive;
+            z-index:2;
+        }
         .logo-bars {
             position:absolute;
             right:6px;
@@ -782,10 +790,7 @@ def main() -> None:
         
         st.markdown(
             """
-            <div class="logo-icon">
-              <span class="logo-letter">G</span>
-            </div>
-        
+              <span class="logo-letter-sidebar">G</span>
             """,
             unsafe_allow_html=True,
         )
