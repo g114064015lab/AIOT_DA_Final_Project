@@ -784,7 +784,7 @@ def main() -> None:
     nav = st.radio("導航", tabs, horizontal=True, label_visibility="collapsed", key="nav_radio")
 
     if nav != "Products":
-        st.sidebar.info("?? Products ?即?使???、推論?????)
+        st.sidebar.info("?? Products ?即?使???、推論?????")
 
     with st.sidebar:
         st.header("?? ??設?")
