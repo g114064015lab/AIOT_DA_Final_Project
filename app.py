@@ -774,9 +774,7 @@ def main() -> None:
             default=["gunshot", "glass_break", "scream"],
         )
         st.divider()
-        st.markdown("**互動元素**")
-        show_spectrogram = st.checkbox("顯示頻譜圖", value=True)
-        allow_download = st.checkbox("允許下載偵測結果 CSV", value=True)
+        <span class="logo-letter">G</span>
 
     if nav == "Products":
         st.subheader("1) 載入音訊")
