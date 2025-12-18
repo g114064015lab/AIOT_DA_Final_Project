@@ -525,7 +525,7 @@ def main() -> None:
         }
         .logo-letter-sidebar {
             font-weight:900;
-            font-size:80px;
+            font-size:120px;
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
             font-family: 'Kunstler Script', cursive;
