@@ -4,7 +4,7 @@
  通用城市音訊辨識與防禦系統 — 守護與防禦，強調安全性與可靠性，給政府與公眾強烈信賴感。
 
 > 兩階段聲音事件偵測（Two-Stage SED）：輕量 CNN 做邊緣偵測，Transformer/CRNN 做時序精煉，支援即時公共安全警報（槍響、玻璃破裂、尖叫等）。
-- Streamlit: https://aiotda-finalpro-guard-group10.streamlit.app/
+🚀 **Try it now:** [General Urban Audio Recognition & Defense](https://aiotda-finalpro-guard-group10.streamlit.app/)
 ---
 
 ## 目錄
