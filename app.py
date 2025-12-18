@@ -517,10 +517,11 @@ def main() -> None:
         }
         .logo-letter {
             font-weight:700;
-            font-size:40px;
+            font-size:30px;
             letter-spacing:-0.5px;
             color: rgb(128, 99, 88);
             font-family: 'Kunstler Script', cursive;
+            position:left;
             z-index:1;
         }
         .logo-letter-sidebar {
